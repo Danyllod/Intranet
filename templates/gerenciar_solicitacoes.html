@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Gerenciar Solicitações" }}</title>
+
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    >
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fb 0%, #e8ecf1 100%);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            padding: 20px 0;
+        }
+
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            color: #777;
+            font-size: 0.95rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-control {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-pendentes {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-pendentes:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .btn-historico {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-historico:hover {
+            background-color: #545b62;
+            color: white;
+        }
+
+        .btn-historico.active {
+            background-color: #007bff;
+        }
+
+        .btn-confirmacoes {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .btn-confirmacoes:hover {
+            background-color: #16a34a;
+            color: white;
+        }
+
+        .solicitacoes-wrapper {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .solicitacoes-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 20px 24px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1.5fr 1fr 1.5fr;
+            gap: 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .solicitacao-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e9edf5;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1.5fr 1fr 1.5fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .solicitacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .solicitacao-data {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .solicitacao-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-nome {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-evento {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .info-local {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .solicitacao-horario {
+            color: #c2185b;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .status-pendente {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .status-aprovado {
+            background-color: #f0fdf4;
+            color: #22c55e;
+        }
+
+        .status-negado {
+            background-color: #fee2e2;
+            color: #ef4444;
+        }
+
+        .solicitacao-acoes {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .btn-aprovar {
+            background-color: #22c55e;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-aprovar:hover {
+            background-color: #16a34a;
+        }
+
+        .btn-negar {
+            background-color: #ef4444;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-negar:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-participantes {
+            background-color: #8b5cf6;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-participantes:hover {
+            background-color: #7c3aed;
+        }
+
+        .empty-message {
+            padding: 40px;
+            text-align: center;
+            color: #777;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 16px;
+        }
+
+        .modal-backdrop {
+            --bs-backdrop-opacity: 0.7;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 20px 24px;
+        }
+
+        .modal-title {
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            border: 2px solid #e9edf5;
+            border-radius: 8px;
+            padding: 10px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e9edf5;
+        }
+
+        .btn-modal-cancel {
+            background-color: #e9edf5;
+            border: none;
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-modal-cancel:hover {
+            background-color: #d9dff5;
+        }
+
+        .btn-modal-submit {
+            background-color: #ef4444;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-modal-submit:hover {
+            background-color: #dc2626;
+        }
+
+        .participants-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .participants-list li {
+            padding: 10px;
+            background-color: #f9fafc;
+            border-left: 3px solid #007bff;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            color: #333;
+        }
+
+        .participants-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .no-participants {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+            background-color: #f9fafc;
+            border-radius: 8px;
+        }
+
+        @media (max-width: 1024px) {
+            .solicitacoes-header,
+            .solicitacao-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .solicitacao-acoes {
+                margin-top: 12px;
+            }
+        }
+
+        .tabs-container {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9edf5;
+            display: flex;
+            gap: 20px;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #777;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: #333;
+        }
+
+        .tab-button.active {
+            color: #007bff;
+            border-bottom-color: #007bff;
+        }
+
+        .tab-button.tab-cancelamentos.active {
+            color: #ef4444;
+            border-bottom-color: #ef4444;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .cancelamento-header {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 20px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1.2fr 1.2fr 1fr 1.5fr;
+            gap: 16px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .cancelamento-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e9edf5;
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1.2fr 1.2fr 1fr 1.5fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .cancelamento-item:last-child {
+            border-bottom: none;
+        }
+
+        .cancelamento-data {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .cancelamento-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-solicitante {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .info-motivo {
+            font-size: 0.85rem;
+            color: #666;
+            max-height: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cancelamento-status {
+            color: #ef4444;
+            font-weight: 600;
+        }
+    </style>
+
+    </style>
+</head>
+<body>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1 class="page-title"><i class="fas fa-tasks"></i> Gerenciar Solicitações</h1>
+        <p class="page-subtitle">Analise e aprove/negue as solicitações de reserva de salas</p>
+        
+        <div class="controls">
+            {% if not incluir_historico %}
+            <form method="GET" action="{{ url_for('main.gerenciar_solicitacoes') }}" style="display: inline;">
+                <input type="hidden" name="historico" value="true">
+                <button type="submit" class="btn-control btn-historico">
+                    <i class="fas fa-history"></i> Ver Histórico
+                </button>
+            </form>
+            {% else %}
+            <a href="{{ url_for('main.gerenciar_solicitacoes') }}" class="btn-control btn-pendentes">
+                <i class="fas fa-hourglass-half"></i> Apenas Pendentes
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('main.gerenciar_confirmacoes') }}" class="btn-control btn-confirmacoes">
+                <i class="fas fa-check-circle"></i> Gerenciar Confirmações
+            </a>
+            
+            <a href="{{ url_for('main.agenda_salas') }}" class="btn-control" style="background-color: #6c757d; color: white;">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <!-- Abas de Conteúdo -->
+    <div class="tabs-container">
+        <button class="tab-button tab-reservas active" onclick="mudarAba('reservas', this)">
+            <i class="fas fa-file-invoice"></i> Solicitações de Reserva
+        </button>
+        <button class="tab-button tab-cancelamentos" onclick="mudarAba('cancelamentos', this)">
+            <i class="fas fa-ban"></i> Solicitações de Cancelamento
+        </button>
+    </div>
+
+    <!-- Aba: Solicitações de Reserva -->
+    <div id="aba-reservas" class="tab-content active">
+        <!-- Lista de Solicitações -->
+        <div class="solicitacoes-wrapper">
+            {% if solicitacoes and solicitacoes|length > 0 %}
+                <div class="solicitacoes-header">
+                    <div>Data</div>
+                    <div>Informações</div>
+                    <div>Horário</div>
+                    <div>Status</div>
+                    <div>Ações</div>
+                </div>
+
+                {% for solicitacao in solicitacoes %}
+                <div class="solicitacao-item">
+                    <div class="solicitacao-data">
+                        {{ solicitacao.data|traduzir_data_pt }}
+                    </div>
+
+                    <div class="solicitacao-info">
+                        <div class="info-nome">{{ solicitacao.reservado_por }}</div>
+                        {% if solicitacao.evento %}
+                        <div class="info-evento"><i class="fas fa-calendar-alt"></i> {{ solicitacao.evento }}</div>
+                        {% endif %}
+                        <div class="info-local">📍 {{ solicitacao.local }}</div>
+                    </div>
+
+                    <div class="solicitacao-horario">
+                        {{ solicitacao.hora_inicio.strftime('%H:%M') }} - {{ solicitacao.hora_fim.strftime('%H:%M') }}
+                    </div>
+
+                    <div>
+                        {% if solicitacao.status == 'pendente' %}
+                        <span class="status-badge status-pendente">Pendente</span>
+                        {% elif solicitacao.status == 'aprovado' %}
+                        <span class="status-badge status-aprovado">Aprovado</span>
+                        {% else %}
+                        <span class="status-badge status-negado">Negado</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="solicitacao-acoes">
+                        {% if solicitacao.status == 'pendente' %}
+                        <form method="POST" action="{{ url_for('main.aprovar_solicitacao', id=solicitacao.id) }}" style="display: inline;">
+                            <input type="hidden" name="aprovado_por" value="Admin">
+                            <button type="submit" class="btn-aprovar" title="Aprovar solicitação">
+                                <i class="fas fa-check"></i> Aprovar
+                            </button>
+                        </form>
+
+                        <button class="btn-negar" data-bs-toggle="modal" data-bs-target="#modalNegar{{ solicitacao.id }}" title="Negar solicitação">
+                            <i class="fas fa-times"></i> Negar
+                        </button>
+
+                        {% if solicitacao.participantes %}
+                        <button class="btn-participantes" data-bs-toggle="modal" data-bs-target="#modalParticipantes{{ solicitacao.id }}" title="Ver participantes">
+                            <i class="fas fa-users"></i> Participantes
+                        </button>
+                        {% endif %}
+
+                        <!-- Modal para negar -->
+                        <div class="modal fade" id="modalNegar{{ solicitacao.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Motivo da Negação</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('main.negar_solicitacao', id=solicitacao.id) }}">
+                                        <div class="modal-body">
+                                            <label for="motivo{{ solicitacao.id }}" class="form-label">Explique o motivo da negação</label>
+                                            <textarea 
+                                                class="form-control" 
+                                                id="motivo{{ solicitacao.id }}" 
+                                                name="motivo_negacao" 
+                                                rows="4"
+                                                placeholder="Digite o motivo da negação..."
+                                                required
+                                            ></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="submit" class="btn-modal-submit">
+                                                Confirmar Negação
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% elif solicitacao.status == 'aprovado' %}
+                        <div style="font-size: 0.85rem; color: #777;">
+                            Aprovado por: <strong>{{ solicitacao.aprovado_por }}</strong><br>
+                            <small>{{ solicitacao.data_decisao.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                        {% else %}
+                        <div style="font-size: 0.85rem; color: #777;">
+                            <strong>Motivo:</strong> {{ solicitacao.motivo_negacao }}<br>
+                            <small>{{ solicitacao.data_decisao.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Modal para participantes -->
+                {% if solicitacao.participantes %}
+                <div class="modal fade" id="modalParticipantes{{ solicitacao.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header" style="background-color: #8b5cf6;">
+                                <h5 class="modal-title"><i class="fas fa-users"></i> Participantes - {{ solicitacao.reservado_por }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                {% set participantes_list = solicitacao.participantes.split('\n') %}
+                                {% if participantes_list and participantes_list|length > 0 %}
+                                <ul class="participants-list">
+                                    {% for participante in participantes_list %}
+                                        {% if participante.strip() %}
+                                        <li>{{ participante.strip() }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <div class="no-participants">
+                                    <i class="fas fa-info-circle"></i> Nenhum participante cadastrado
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                    Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% endfor %}
+            {% else %}
+            <div class="empty-message">
+                <div class="empty-icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                {% if incluir_historico %}
+                <p><strong>Nenhuma solicitação encontrada</strong></p>
+                {% else %}
+                <p><strong>Nenhuma solicitação pendente!</strong></p>
+                <p style="margin-top: 10px; color: #999;">Todas as solicitações foram processadas</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Aba: Solicitações de Cancelamento -->
+    <div id="aba-cancelamentos" class="tab-content">
+        <!-- Lista de Solicitações de Cancelamento -->
+        <div class="solicitacoes-wrapper">
+            {% if cancelamentos and cancelamentos|length > 0 %}
+                <div class="cancelamento-header">
+                    <div>Data da Reserva</div>
+                    <div>Informações</div>
+                    <div>Reserva</div>
+                    <div>Evento</div>
+                    <div>Status</div>
+                    <div>Ações</div>
+                </div>
+
+                {% for cancelamento in cancelamentos %}
+                <div class="cancelamento-item">
+                    <div class="cancelamento-data">
+                        {{ cancelamento.reserva.data|traduzir_data_pt }}
+                    </div>
+
+                    <div class="cancelamento-info">
+                        <div class="info-solicitante">{{ cancelamento.reserva.reservado_por }}</div>
+                        <div class="info-motivo">
+                            <i class="fas fa-user-check"></i> Solicitado por: {{ cancelamento.solicitante }}
+                        </div>
+                    </div>
+
+                    <div class="cancelamento-status">
+                        📍 {{ cancelamento.reserva.local }}<br>
+                        <small>{{ cancelamento.reserva.hora_inicio.strftime('%H:%M') }} - {{ cancelamento.reserva.hora_fim.strftime('%H:%M') }}</small>
+                    </div>
+
+                    <div>
+                        {% if cancelamento.reserva.evento %}
+                        <span style="font-weight: 600; color: #333;">{{ cancelamento.reserva.evento }}</span>
+                        {% else %}
+                        <span style="color: #999; font-style: italic;">-</span>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        {% if cancelamento.status == 'pendente' %}
+                        <span class="status-badge status-pendente">Pendente</span>
+                        {% elif cancelamento.status == 'aprovado' %}
+                        <span class="status-badge status-aprovado">Aprovado</span>
+                        {% else %}
+                        <span class="status-badge status-negado">Negado</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="solicitacao-acoes">
+                        {% if cancelamento.status == 'pendente' %}
+                        <form method="POST" action="{{ url_for('main.aprovar_cancelamento', id=cancelamento.id) }}" style="display: inline;">
+                            <input type="hidden" name="aprovado_por" value="Admin">
+                            <button type="submit" class="btn-aprovar" title="Aprovar cancelamento">
+                                <i class="fas fa-check"></i> Aprovar
+                            </button>
+                        </form>
+
+                        <button class="btn-negar" data-bs-toggle="modal" data-bs-target="#modalNegarCancelamento{{ cancelamento.id }}" title="Negar cancelamento">
+                            <i class="fas fa-times"></i> Negar
+                        </button>
+
+                        <button class="btn-participantes" data-bs-toggle="modal" data-bs-target="#modalMotivoCancelamento{{ cancelamento.id }}" title="Ver motivo">
+                            <i class="fas fa-info-circle"></i> Detalhes
+                        </button>
+
+                        <!-- Modal para negar cancelamento -->
+                        <div class="modal fade" id="modalNegarCancelamento{{ cancelamento.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Motivo da Negação</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <form method="POST" action="{{ url_for('main.negar_cancelamento', id=cancelamento.id) }}">
+                                        <div class="modal-body">
+                                            <label for="motivoNegar{{ cancelamento.id }}" class="form-label">Explique o motivo da negação</label>
+                                            <textarea 
+                                                class="form-control" 
+                                                id="motivoNegar{{ cancelamento.id }}" 
+                                                name="motivo_negacao" 
+                                                rows="4"
+                                                placeholder="Digite o motivo da negação..."
+                                                required
+                                            ></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                                Cancelar
+                                            </button>
+                                            <button type="submit" class="btn-modal-submit">
+                                                Confirmar Negação
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal para ver motivo -->
+                        <div class="modal fade" id="modalMotivoCancelamento{{ cancelamento.id }}" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header" style="background-color: #ef4444;">
+                                        <h5 class="modal-title"><i class="fas fa-file-alt"></i> Detalhes da Solicitação</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div style="margin-bottom: 20px;">
+                                            <strong>Reservado por:</strong> {{ cancelamento.reserva.reservado_por }}
+                                        </div>
+                                        <div style="margin-bottom: 20px;">
+                                            <strong>Cancelamento solicitado por:</strong> {{ cancelamento.solicitante }}
+                                        </div>
+                                        <div style="margin-bottom: 20px;">
+                                            <strong>Data da Reserva:</strong> {{ cancelamento.reserva.data|traduzir_data_pt }}
+                                        </div>
+                                        <div style="margin-bottom: 20px;">
+                                            <strong>Informações da Solicitação:</strong><br>
+                                            <p style="background-color: #f9fafc; padding: 12px; border-radius: 6px; color: #333;">{{ cancelamento.motivo }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn-modal-cancel" data-bs-dismiss="modal">
+                                            Fechar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {% elif cancelamento.status == 'aprovado' %}
+                        <div style="font-size: 0.85rem; color: #777;">
+                            Aprovado por: <strong>{{ cancelamento.aprovado_por }}</strong><br>
+                            <small>{{ cancelamento.data_decisao.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                        {% else %}
+                        <div style="font-size: 0.85rem; color: #777;">
+                            <strong>Motivo:</strong> {{ cancelamento.motivo_negacao }}<br>
+                            <small>{{ cancelamento.data_decisao.strftime('%d/%m/%Y %H:%M') }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% endfor %}
+            {% else %}
+            <div class="empty-message">
+                <div class="empty-icon">
+                    <i class="fas fa-ban"></i>
+                </div>
+                {% if incluir_historico %}
+                <p><strong>Nenhuma solicitação de cancelamento encontrada</strong></p>
+                {% else %}
+                <p><strong>Nenhuma solicitação de cancelamento pendente!</strong></p>
+                <p style="margin-top: 10px; color: #999;">Tudo em dia</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function mudarAba(abaName, buttonElement) {
+        // Esconde todas as abas
+        document.querySelectorAll('.tab-content').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // Remove active de todos os botões
+        document.querySelectorAll('.tab-button').forEach(el => {
+            el.classList.remove('active');
+        });
+        
+        // Mostra a aba selecionada
+        document.getElementById('aba-' + abaName).classList.add('active');
+        buttonElement.classList.add('active');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

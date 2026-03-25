@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Conexão CRESM - Portal de Notícias{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header/Navigation -->
+    <header class="header-cresm">
+        <!-- Top Navigation Bar - Verde Escuro -->
+        <nav class="navbar navbar-dark navbar-expand-lg" style="background-color: #2b2b2b; min-height: 120px;">
+                    <div class="col-lg-2">
+                    </div>
+                    <div class="col-lg-6 d-flex justify-content-center align-items-center">
+                        <div class="logo-section text-center">
+                            <h2 class="mb-0 fw-light titulo-animado" style="font-family: 'Poppins', sans-serif; font-size: 2.5rem; letter-spacing: 2px; color: #00c4ff;">CONEXÃO CRESM</h2>
+                            <p class="small mb-1 fw-light" style="font-family: 'Poppins', sans-serif; color: #00c4ff;">Complexo de Referência Estadual em Saúde Mental</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 d-flex justify-content-center align-items-center">
+                        <img src="{{ url_for('static', filename='imagens/nav.gif') }}" alt="Animação CRESM" style="max-height: 110px; width: auto; object-fit: contain;">
+                    </div>
+        </nav>
+
+        <!-- Main Navigation Menu -->
+        <nav class="navbar navbar-expand-lg navbar-light border-bottom" style="background-color: #1b5e3c; color: white;">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active fw-bold" href="{{ url_for('main.index') }}" style="color: white !important;">
+                                <i class="fas fa-home"></i> Início
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" href="{{ url_for('main.noticias') }}" style="color: white !important;">
+                                <i class="fas fa-newspaper"></i> Notícias
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" href="{{ url_for('main.jornal') }}" style="color: white !important;">
+                                <i class="fas fa-book"></i> Jornal
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle fw-bold" href="#" id="agendaDropdown" role="button" data-bs-toggle="dropdown" style="color: white !important;">
+                                <i class="fas fa-calendar"></i> Agenda
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('main.agenda_salas') }}">Visualizar</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.solicitar_reserva_sala') }}">Reserva</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.solicitar_cancelamento_reserva') }}">Cancelamento</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link fw-bold" href="{{ url_for('main.sobre') }}" style="color: white !important;">
+                                <i class="fas fa-info-circle"></i> Sobre
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <div class="social-icons" style="display: flex; gap: 1rem; margin-left: 1rem;">
+                                <a href="#" style="color: white !important;"><i class="fab fa-youtube fa-lg"></i></a>
+                                <a href="#" style="color: white !important;"><i class="fab fa-instagram fa-lg"></i></a>
+                                <a href="#" style="color: white !important;"><i class="fab fa-facebook fa-lg"></i></a>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="py-5" style="background-color: #e3edf2;">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-cresm text-white py-5">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white fw-bold mb-3"><i class="fas fa-hospital"></i> Conexão CRESM</h5>
+                    <p class="text-white-50 small">Seu portal de informações confiável e atualizado sobre os principais acontecimentos relacionados à saúde mental.</p>
+                </div>
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white fw-bold mb-3">Categorias</h5>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li><a href="#" class="text-decoration-none text-white-50">Tecnologia</a></li>
+                        <li><a href="#" class="text-decoration-none text-white-50">Política</a></li>
+                        <li><a href="#" class="text-decoration-none text-white-50">Esportes</a></li>
+                        <li><a href="#" class="text-decoration-none text-white-50">Entretenimento</a></li>
+                    </ul>
+                    <a href="{{ url_for('main.agenda_salas') }}" class="btn btn-sm btn-outline-light mt-3">
+                        <i class="fas fa-calendar-alt"></i> Acessar Agenda
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white fw-bold mb-3">Redes Sociais</h5>
+                    <div class="social-links">
+                        <a href="#" class="text-white me-3"><i class="fab fa-facebook fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-lg"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-youtube fa-lg"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-white-50 mt-4">
+            <div class="text-center text-white-50 small">
+                <p class="mb-0">&copy; 2026 Conexão CRESM. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,1171 @@
+/* ============================================
+   VARIÁVEIS E RESET
+   ============================================ */
+:root {
+    --cresm-dark: #1b5e3c;
+    --cresm-green: #2d7d4f;
+    --cresm-light-green: #4a9f6f;
+    --primary-color: #2d7d4f;
+    --danger-color: #2d7d4f;
+    --secondary-color: #6c757d;
+    --light-bg: #f0f0f0;
+    --border-color: #dee2e6;
+}
+
+/* ============================================
+   ANIMAÇÕES DE TITULO
+   ============================================ */
+@keyframes colorLoading {
+    0% {
+        opacity: 0.3;
+        filter: drop-shadow(0 0 5px rgba(0, 196, 255, 0.4));
+    }
+    50% {
+        opacity: 0.7;
+        filter: drop-shadow(0 0 15px rgba(0, 196, 255, 0.7));
+    }
+    100% {
+        opacity: 1;
+        filter: drop-shadow(0 0 20px rgba(0, 196, 255, 0.9));
+    }
+}
+
+.titulo-animado {
+    animation: colorLoading 3s ease-in-out forwards;
+    font-weight: 300 !important;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    background-color: #f0f0f0;
+}
+
+/* ============================================
+   CORES CUSTOMIZADAS
+   ============================================ */
+.bg-cresm-dark {
+    background-color: var(--cresm-dark) !important;
+}
+
+.bg-cresm-green {
+    background-color: var(--cresm-green) !important;
+}
+
+.text-cresm-green {
+    color: var(--cresm-green) !important;
+}
+
+.btn-cresm-green {
+    background-color: var(--cresm-dark) !important;
+    border-color: var(--cresm-dark) !important;
+    color: white !important;
+}
+
+.btn-cresm-green:hover {
+    background-color: var(--cresm-green) !important;
+    border-color: var(--cresm-green) !important;
+}
+
+/* ============================================
+   HEADER E NAVEGAÇÃO
+   ============================================ */
+.header-cresm {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    color: white !important;
+}
+
+.header-cresm .text-cresm-green {
+    color: white !important;
+}
+
+.header-news {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Top Navigation */
+.navbar-dark.bg-cresm-dark {
+    background: linear-gradient(135deg, var(--cresm-dark) 0%, var(--cresm-green) 100%) !important;
+}
+
+.navbar-dark.bg-cresm-dark .nav-link {
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem !important;
+}
+
+.navbar-dark.bg-cresm-dark .nav-link:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.nav-divider {
+    width: 1px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Logo Section */
+.logo-section {
+    padding: 1rem 0;
+}
+
+.logo-section h2 {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+}
+
+.logo-section p {
+    font-size: 0.9rem;
+    margin: 0.3rem 0;
+}
+
+/* Search Form */
+.header-news .form-control {
+    border: 2px solid var(--cresm-green);
+    border-radius: 4px;
+    padding: 0.75rem;
+    font-size: 0.95rem;
+}
+
+.header-news .form-control:focus {
+    border-color: var(--cresm-dark);
+    box-shadow: 0 0 0 0.2rem rgba(45, 125, 79, 0.25);
+}
+
+/* Social Icons */
+.social-icons a {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+    transform: scale(1.2);
+    color: var(--cresm-dark) !important;
+}
+
+/* Main Navigation Menu */
+.navbar-nav .nav-link {
+    font-weight: 600;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    color: var(--cresm-green) !important;
+    border-radius: 4px;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(45, 125, 79, 0.1);
+    color: var(--cresm-dark) !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: var(--cresm-dark) !important;
+    border-bottom: 3px solid var(--cresm-dark);
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item {
+    color: var(--cresm-green);
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(45, 125, 79, 0.1);
+    color: var(--cresm-dark);
+}
+
+/* ============================================
+   FEATURED ARTICLES
+   ============================================ */
+.featured-articles {
+    margin-top: 2rem;
+}
+
+.featured-card {
+    position: relative;
+    overflow: hidden;
+    height: 450px;
+    background-color: #000;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border-radius: 8px;
+}
+
+.featured-card:hover {
+    transform: scale(1.02);
+}
+
+.featured-card img {
+    transition: opacity 0.3s ease;
+    height: 100%;
+    object-fit: cover;
+}
+
+.featured-card:hover img {
+    opacity: 0.7;
+}
+
+.featured-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+}
+
+.featured-content h2 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.featured-content p {
+    color: #ddd;
+    font-size: 0.95rem;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card {
+    transition: all 0.3s ease;
+    border: none !important;
+    border-radius: 8px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(45, 125, 79, 0.15) !important;
+}
+
+.card-img-top {
+    transition: transform 0.3s ease;
+    border-radius: 8px 8px 0 0;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.trending-card {
+    position: relative;
+}
+
+.trending-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--cresm-green), var(--cresm-light-green));
+    border-radius: 4px 4px 0 0;
+}
+
+.news-card {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.news-card .card-footer {
+    padding: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.news-card:hover .card-footer {
+    background-color: #e9ecef !important;
+}
+
+/* ============================================
+   SEÇÕES
+   ============================================ */
+.section-header {
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-header h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--cresm-dark);
+    border-bottom: 3px solid var(--cresm-green);
+    padding-bottom: 1rem;
+    display: inline-block;
+}
+
+.section-divider {
+    border-color: var(--cresm-green);
+    opacity: 0.3;
+}
+
+/* ============================================
+   TRENDING
+   ============================================ */
+.trending-section {
+    background: linear-gradient(135deg, rgba(45, 125, 79, 0.05) 0%, rgba(74, 159, 111, 0.05) 100%);
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+/* ============================================
+   NEWSLETTER
+   ============================================ */
+.newsletter-section {
+    background: linear-gradient(135deg, var(--cresm-dark) 0%, var(--cresm-green) 100%);
+    color: white;
+    padding: 3rem;
+    border-radius: 8px;
+}
+
+.newsletter-section h4 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.newsletter-section .form-control {
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px 0 0 6px;
+}
+
+.newsletter-section .btn {
+    border-radius: 0 6px 6px 0;
+    background-color: var(--cresm-dark);
+    border-color: var(--cresm-dark);
+    font-weight: 600;
+    color: white;
+}
+
+.newsletter-section .btn:hover {
+    background-color: var(--cresm-light-green);
+    border-color: var(--cresm-light-green);
+}
+
+/* ============================================
+   WIDGETS
+   ============================================ */
+.widget {
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.widget .card-header {
+    padding: 1.2rem;
+    border: none;
+    font-weight: 600;
+    background-color: var(--cresm-dark);
+    color: white;
+}
+
+.widget .card-body {
+    padding: 1.5rem;
+}
+
+.widget ul li a {
+    transition: color 0.3s ease;
+    padding: 0.5rem 0;
+    display: block;
+    color: var(--cresm-green) !important;
+}
+
+.widget ul li a:hover {
+    padding-left: 0.5rem;
+    color: var(--cresm-dark) !important;
+}
+
+/* ============================================
+   TEAM SECTION
+   ============================================ */
+.team-card {
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.team-card img {
+    border: 4px solid var(--cresm-green);
+    transition: transform 0.3s ease;
+}
+
+.team-card:hover img {
+    transform: scale(1.1);
+}
+
+/* ============================================
+   CONTACT SECTION
+   ============================================ */
+.contact-section {
+    background-color: var(--light-bg);
+}
+
+.contact-info {
+    padding: 2rem 0;
+}
+
+.contact-item {
+    transition: transform 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateX(10px);
+}
+
+.contact-item h6 {
+    font-weight: 700;
+    color: var(--cresm-dark);
+    margin-bottom: 0.5rem;
+}
+
+.contact-item p {
+    margin-bottom: 0;
+    color: var(--secondary-color);
+}
+
+.contact-item i {
+    color: var(--cresm-green) !important;
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+    background: linear-gradient(135deg, var(--cresm-dark) 0%, #0f4c2f 100%);
+    color: white;
+    margin-top: auto;
+    border-top: 3px solid var(--cresm-green);
+}
+
+footer h5 {
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1.5rem;
+}
+
+footer a {
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--cresm-light-green);
+}
+
+.social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background-color: var(--cresm-green);
+    transform: translateY(-5px);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge {
+    padding: 0.5rem 0.8rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+    background-color: var(--cresm-green);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .logo-section h2 {
+        font-size: 1.8rem;
+    }
+
+    .featured-card {
+        height: 300px;
+    }
+
+    .featured-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .featured-overlay {
+        padding: 1rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.4rem;
+    }
+
+    .newsletter-section {
+        padding: 2rem !important;
+    }
+
+    .newsletter-section .input-group {
+        flex-direction: column;
+    }
+
+    .newsletter-section .form-control,
+    .newsletter-section .btn {
+        border-radius: 6px;
+        width: 100%;
+    }
+
+    .newsletter-section .form-control {
+        margin-bottom: 0.5rem;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 0 !important;
+    }
+
+    nav a {
+        display: block;
+        padding: 0.5rem 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .featured-card {
+        height: 250px;
+    }
+
+    .featured-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .widget .card-body {
+        padding: 1rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+    }
+
+    .logo-section {
+        margin-bottom: 1rem;
+    }
+}
+
+/* ============================================
+   ANIMAÇÕES
+   ============================================ */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* ============================================
+   ACESSIBILIDADE
+   ============================================ */
+a:focus,
+button:focus {
+    outline: 2px solid var(--cresm-green);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--cresm-green);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--cresm-dark);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #005eff;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+}
+
+/* ============================================
+   HEADER E NAVEGAÇÃO
+   ============================================ */
+.header-news {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: white;
+}
+
+.header-news .container-fluid {
+    background-color: #19e619 !important;
+}
+
+.header-news .container-fluid h1,
+.header-news .container-fluid p,
+.header-news .container-fluid small,
+.header-news .container-fluid i {
+    color: #005eff !important;
+}
+
+.header-news h1 {
+    font-weight: 700;
+    font-size: 2rem;
+    color: #005eff;
+    letter-spacing: -0.5px;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    margin: 0 0.5rem;
+    transition: color 0.3s ease;
+    color: #005eff !important;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--accent-green) !important;
+}
+
+.navbar-nav .nav-link.active {
+    color: var(--accent-green) !important;
+    border-bottom: 3px solid var(--accent-green);
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dropdown-item:hover {
+    background-color: var(--light-bg);
+    color: var(--danger-color);
+}
+
+/* ============================================
+   FEATURED ARTICLES
+   ============================================ */
+.featured-articles {
+    margin-top: 2rem;
+}
+
+.featured-card {
+    position: relative;
+    overflow: hidden;
+    height: 450px;
+    background-color: #000;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.featured-card:hover {
+    transform: scale(1.02);
+}
+
+.featured-card img {
+    transition: opacity 0.3s ease;
+    height: 100%;
+    object-fit: cover;
+}
+
+.featured-card:hover img {
+    opacity: 0.7;
+}
+
+.featured-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+}
+
+.featured-content h2 {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+}
+
+.featured-content p {
+    color: #ddd;
+    font-size: 0.95rem;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card {
+    transition: all 0.3s ease;
+    border: none !important;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.trending-card {
+    position: relative;
+}
+
+.trending-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--danger-color), #ff6b6b);
+    border-radius: 4px 4px 0 0;
+}
+
+.news-card {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.news-card .card-footer {
+    padding: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.news-card:hover .card-footer {
+    background-color: #e9ecef !important;
+}
+
+/* ============================================
+   SEÇÕES
+   ============================================ */
+.section-header {
+    position: relative;
+    padding-bottom: 1rem;
+}
+
+.section-header h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    border-bottom: 3px solid var(--danger-color);
+    padding-bottom: 1rem;
+    display: inline-block;
+}
+
+.section-divider {
+    border-color: var(--danger-color);
+    opacity: 0.3;
+}
+
+/* ============================================
+   TRENDING
+   ============================================ */
+.trending-section {
+    background: linear-gradient(135deg, rgba(220, 53, 69, 0.05) 0%, rgba(255, 107, 107, 0.05) 100%);
+    padding: 2rem;
+    border-radius: 12px;
+}
+
+/* ============================================
+   NEWSLETTER
+   ============================================ */
+.newsletter-section {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #ff6b6b 100%);
+    color: white;
+    padding: 3rem;
+}
+
+.newsletter-section h4 {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.newsletter-section .form-control {
+    border: none;
+    padding: 0.8rem 1.2rem;
+    border-radius: 6px 0 0 6px;
+}
+
+.newsletter-section .btn {
+    border-radius: 0 6px 6px 0;
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 600;
+    color: white;
+}
+
+.newsletter-section .btn:hover {
+    background-color: #003fa6;
+    border-color: #003fa6;
+}
+
+/* ============================================
+   WIDGETS
+   ============================================ */
+.widget {
+    margin-bottom: 2rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.widget .card-header {
+    padding: 1.2rem;
+    border: none;
+    font-weight: 600;
+}
+
+.widget .card-body {
+    padding: 1.5rem;
+}
+
+.widget ul li a {
+    transition: color 0.3s ease;
+    padding: 0.5rem 0;
+    display: block;
+}
+
+.widget ul li a:hover {
+    padding-left: 0.5rem;
+    color: var(--danger-color) !important;
+}
+
+/* ============================================
+   TEAM SECTION
+   ============================================ */
+.team-card {
+    padding: 2rem;
+    background-color: white;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.team-card img {
+    border: 4px solid var(--danger-color);
+    transition: transform 0.3s ease;
+}
+
+.team-card:hover img {
+    transform: scale(1.1);
+}
+
+/* ============================================
+   CONTACT SECTION
+   ============================================ */
+.contact-section {
+    background-color: var(--light-bg);
+}
+
+.contact-info {
+    padding: 2rem 0;
+}
+
+.contact-item {
+    transition: transform 0.3s ease;
+}
+
+.contact-item:hover {
+    transform: translateX(10px);
+}
+
+.contact-item h6 {
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.contact-item p {
+    margin-bottom: 0;
+    color: var(--secondary-color);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+footer {
+    background-color: #1a1a1a;
+    color: white;
+    margin-top: auto;
+    border-top: 3px solid var(--danger-color);
+}
+
+footer h5 {
+    font-weight: 700;
+    color: var(--danger-color);
+    margin-bottom: 1.5rem;
+}
+
+footer a {
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--danger-color);
+}
+
+.social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background-color: var(--danger-color);
+    transform: translateY(-5px);
+}
+
+/* ============================================
+   BADGES
+   ============================================ */
+.badge {
+    padding: 0.5rem 0.8rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 4px;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+    .header-news h1 {
+        font-size: 1.5rem;
+    }
+
+    .featured-card {
+        height: 300px;
+    }
+
+    .featured-content h2 {
+        font-size: 1.3rem;
+    }
+
+    .featured-overlay {
+        padding: 1rem;
+    }
+
+    .section-header h3 {
+        font-size: 1.4rem;
+    }
+
+    .newsletter-section {
+        padding: 2rem !important;
+    }
+
+    .newsletter-section .input-group {
+        flex-direction: column;
+    }
+
+    .newsletter-section .form-control,
+    .newsletter-section .btn {
+        border-radius: 6px;
+        width: 100%;
+    }
+
+    .newsletter-section .form-control {
+        margin-bottom: 0.5rem;
+    }
+
+    nav ul {
+        flex-direction: column;
+        gap: 0 !important;
+    }
+
+    nav a {
+        display: block;
+        padding: 0.5rem 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .featured-card {
+        height: 250px;
+    }
+
+    .featured-content h2 {
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .widget .card-body {
+        padding: 1rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem;
+    }
+
+    h5 {
+        font-size: 1rem;
+    }
+}
+
+/* ============================================
+   ANIMAÇÕES
+   ============================================ */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* ============================================
+   ACESSIBILIDADE
+   ============================================ */
+a:focus,
+button:focus {
+    outline: 2px solid var(--danger-color);
+    outline-offset: 2px;
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--danger-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #c82333;
+}

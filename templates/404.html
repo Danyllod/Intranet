@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Página não encontrada - Conexão CRESM{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row align-items-center" style="min-height: 60vh;">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-1 text-cresm-green fw-bold">404</h1>
+            <h2 class="mb-3">Página não encontrada</h2>
+            <p class="lead text-muted mb-4">Desculpe, a página que você está procurando não existe.</p>
+            <a href="{{ url_for('main.index') }}" class="btn btn-cresm-dark text-white fw-bold px-5 py-2">Voltar ao Início</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

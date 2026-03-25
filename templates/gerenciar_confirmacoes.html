@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Gerenciar Confirmações" }}</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    >
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+        body {
+            background-color: #f5f7fb;
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        }
+
+        .confirmacoes-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .info-section {
+            background-color: #e3f2fd;
+            padding: 16px 24px;
+            border-bottom: 2px solid #90caf9;
+            font-weight: 600;
+            color: #1565c0;
+        }
+
+        .info-section p {
+            margin: 0;
+        }
+
+        .confirmacoes-header {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: grid;
+            grid-template-columns: 0.75fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .confirmacoes-header .row {
+            display: contents;
+        }
+
+        .confirmacoes-header .col {
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .confirmacao-item {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e9edf5;
+            display: grid;
+            grid-template-columns: 0.75fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .confirmacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .confirmacao-date {
+            text-align: center;
+        }
+
+        .confirmacao-date-full {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .confirmacao-status {
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .status-confirmada {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .status-cancelada {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .confirmacao-reservado-por {
+        }
+
+        .confirmacao-reservado-nome {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .confirmacao-reservado-extra {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .confirmacao-horario {
+        }
+
+        .confirmacao-horario-label {
+            font-weight: 600;
+            color: #c2185b;
+            margin-bottom: 4px;
+        }
+
+        .confirmacao-horario-range {
+            color: #333;
+        }
+
+        .confirmacao-local {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .confirmacao-evento {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .confirmacao-evento-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 2px;
+        }
+
+        .confirmacao-acoes {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-confirmar {
+            background-color: #22c55e;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirmar:hover {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        .btn-cancelar {
+            background-color: #ef4444;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cancelar:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .confirmacoes-empty {
+            padding: 32px;
+            text-align: center;
+            color: #777;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            flex-grow: 1;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .btn-back {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        @media (max-width: 768px) {
+            .confirmacoes-header {
+                display: none;
+            }
+
+            .confirmacao-item {
+                grid-template-columns: 1fr;
+                align-items: flex-start;
+            }
+
+            .confirmacao-date {
+                width: 100%;
+                text-align: left;
+                margin-bottom: 8px;
+            }
+
+            .confirmacao-status,
+            .confirmacao-reservado-por,
+            .confirmacao-horario,
+            .confirmacao-local,
+            .confirmacao-evento,
+            .confirmacao-acoes {
+                width: 100%;
+                padding: 4px 0;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-title">
+            <h1><i class="fas fa-check-circle"></i> Gerenciar Confirmações</h1>
+            <p class="header-subtitle">Confirme ou cancele as reuniões aprovadas</p>
+        </div>
+        <a href="{{ url_for('main.gerenciar_solicitacoes') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="confirmacoes-wrapper">
+
+    <!-- Seção Informativa -->
+    <div class="info-section">
+        <p>📅 Gerenciando confirmações de reuniões. Total: <strong>{{ reunioes|length }}</strong> reunião(ões)</p>
+    </div>
+
+    <!-- Cabeçalho -->
+    <div class="confirmacoes-header">
+        <div class="row">
+            <div class="col">Status</div>
+            <div class="col">Data</div>
+            <div class="col">Reservado por</div>
+            <div class="col">Horário</div>
+            <div class="col">Local</div>
+            <div class="col">Evento</div>
+            <div class="col">Ações</div>
+        </div>
+    </div>
+
+    <!-- Lista de reuniões -->
+    <div id="confirmacoes-body">
+    {% if reunioes and reunioes|length > 0 %}
+        {% for reuniao in reunioes %}
+            <div class="confirmacao-item">
+                <!-- Status -->
+                <div class="confirmacao-status">
+                    {% if reuniao.confirmado %}
+                    <span class="status-badge status-confirmada">✓ Confirmada</span>
+                    {% else %}
+                    <span class="status-badge status-cancelada">✕ Cancelada</span>
+                    {% endif %}
+                </div>
+
+                <!-- Data -->
+                <div class="confirmacao-date">
+                    <div class="confirmacao-date-full">
+                        {{ reuniao.data|traduzir_data_pt }}
+                    </div>
+                </div>
+
+                <!-- Reservado por -->
+                <div class="confirmacao-reservado-por">
+                    <div class="confirmacao-reservado-nome">
+                        {{ reuniao.reservado_por }}
+                    </div>
+                    <div class="confirmacao-reservado-extra">
+                        Reunião aprovada
+                    </div>
+                </div>
+
+                <!-- Horário -->
+                <div class="confirmacao-horario">
+                    <div class="confirmacao-horario-label">
+                        Horário
+                    </div>
+                    <div class="confirmacao-horario-range">
+                        {{ reuniao.hora_inicio.strftime('%H:%M') }}
+                        -
+                        {{ reuniao.hora_fim.strftime('%H:%M') }}
+                    </div>
+                </div>
+
+                <!-- Local -->
+                <div class="confirmacao-local">
+                    {{ reuniao.local }}
+                </div>
+
+                <!-- Evento -->
+                <div class="confirmacao-evento">
+                    <div class="confirmacao-evento-label">Evento</div>
+                    <div>
+                        {% if reuniao.evento %}
+                            <span>{{ reuniao.evento }}</span>
+                        {% else %}
+                            <span style="color: #999; font-style: italic;">Não informado</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="confirmacao-acoes">
+                    <form method="POST" action="{{ url_for('main.confirmar_reuniao', id=reuniao.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-confirmar" title="Confirmar reunião">
+                            <i class="fas fa-check"></i> Confirmar
+                        </button>
+                    </form>
+
+                    <form method="POST" action="{{ url_for('main.cancelar_reuniao', id=reuniao.id) }}" style="display: inline;">
+                        <button type="submit" class="btn-cancelar" title="Cancelar reunião">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="confirmacoes-empty">
+            <i class="fas fa-inbox" style="font-size: 2.5rem; color: #ddd; margin-bottom: 16px;"></i>
+            <p><strong>Nenhuma reunião para gerenciar</strong></p>
+            <p style="margin-top: 10px; color: #999;">Todas as reuniões aprovadas já foram processadas</p>
+        </div>
+    {% endif %}
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

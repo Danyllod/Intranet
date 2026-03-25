@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Agenda de Salas" }}</title>
+    <!-- Bootstrap CSS (pode trocar a CDN se já tiver no layout base) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    >
+
+    <style>
+        body {
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column; /* Alinha os itens em coluna */
+            align-items: center;    /* Centraliza apenas horizontalmente */
+            justify-content: flex-start; /* Garante que comece do topo */
+            background: url("{{ url_for('static', filename='imagens/agenda/Gemini_Generated_Image_cw6vwscw6vwscw6v.png') }}")
+                            center top / cover no-repeat; /* Ajustado para "top" para fixar o topo da imagem */
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            }
+
+        .agenda-wrapper {
+            width: 95%; /* Ajuste para responsividade */
+            max-width: 1100px;
+            margin: 120px auto 40px auto; /* Aumentamos para 120px no topo */
+            background-color: rgba(255,255,255,0.85);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;            max-width: 1100px;
+        }
+
+        .info-section {
+            background-color: #e3f2fd;
+            padding: 16px 24px;
+            border-bottom: 2px solid #90caf9;
+            font-weight: 600;
+            color: #1565c0;
+        }
+
+        .info-section p {
+            margin: 0;
+        }
+
+        .agenda-header {
+            background-color: #007bff;
+            color: #ffffff;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: grid;
+            grid-template-columns: 0.75fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .agenda-header .row {
+            display: contents;
+        }
+
+        .agenda-header .col-2 {
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .agenda-item {
+            padding: 18px 24px;
+            border-bottom: 1px solid #e9edf5;
+            display: grid;
+            grid-template-columns: 0.75fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .agenda-item:last-child {
+            border-bottom: none;
+        }
+
+        .agenda-date {
+            text-align: center;
+        }
+
+        .agenda-date-full {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .agenda-reservado-por {
+        }
+
+        .agenda-reservado-nome {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .agenda-reservado-extra {
+            font-size: 0.85rem;
+            color: #777;
+        }
+
+        .agenda-horario {
+        }
+
+        .agenda-horario-label {
+            font-weight: 600;
+            color: #c2185b; /* cor parecida com a do template original */
+            margin-bottom: 4px;
+        }
+
+        .agenda-horario-range {
+            color: #333;
+        }
+
+        .agenda-local {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .agenda-evento {
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .agenda-evento-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 2px;
+        }
+
+        .agenda-status {
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .status-confirmada {
+            background-color: #22c55e;
+            color: white;
+        }
+
+        .status-cancelada {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-ver-participantes {
+            background-color: #6c757d;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-participantes:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-participantes {
+            background-color: #8b5cf6;
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-participantes:hover {
+            background-color: #7c3aed;
+        }
+
+        .agenda-acoes {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .agenda-empty {
+            padding: 32px;
+            text-align: center;
+            color: #777;
+        }
+
+        /* Modal de participantes */
+        .modal-participantes {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-participantes.ativo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-conteudo {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9edf5;
+        }
+
+        .modal-titulo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #333;
+            margin: 0;
+        }
+
+        .modal-fechar {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-fechar:hover {
+            color: #333;
+            transform: rotate(90deg);
+        }
+
+        .modal-info {
+            margin-bottom: 15px;
+        }
+
+        .modal-info-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            margin-bottom: 4px;
+        }
+
+        .modal-info-valor {
+            color: #333;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .participantes-lista {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .participantes-lista li {
+            padding: 8px 12px;
+            background-color: #f5f7fb;
+            margin-bottom: 6px;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+
+        .participantes-vazio {
+            color: #999;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .agenda-actions {
+            padding: 16px 24px 24px;
+            text-align: right;
+        }
+
+        .btn-nova-reserva {
+            background-color: #007bff;
+            border-color: #007bff;
+            font-weight: 500;
+        }
+
+        .btn-nova-reserva:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+
+        .filter-section {
+            padding: 20px 24px;
+            background-color: #f9fafc;
+            border-bottom: 1px solid #e9edf5;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .filter-input,
+        .filter-select {
+            padding: 10px 12px;
+            border: 2px solid #e9edf5;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus,
+        .filter-select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+        }
+
+        .btn-filter {
+            padding: 10px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter:hover {
+            background-color: #0069d9;
+        }
+
+        .btn-filter-clear {
+            padding: 10px 16px;
+            background-color: #e9edf5;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-filter-clear:hover {
+            background-color: #d9dff5;
+        }
+
+        .no-results {
+            padding: 32px;
+            text-align: center;
+            color: #777;
+        }
+
+        .pagination-container {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e9edf5;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            background-color: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        .pagination-btn:hover {
+            background-color: #e0e0e0;
+            border-color: #999;
+        }
+
+        .pagination-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .agenda-header {
+                display: none; /* some o cabeçalho e deixa cada item mais “card” no mobile */
+            }
+
+            .agenda-item {
+                grid-template-columns: 1fr;
+                align-items: flex-start;
+            }
+
+            .agenda-date {
+                width: 100%;
+                text-align: left;
+                margin-bottom: 8px;
+            }
+
+            .agenda-status,
+            .agenda-reservado-por,
+            .agenda-horario,
+            .agenda-local,
+            .agenda-evento,
+            .agenda-acoes {
+                width: 100%;
+                padding: 4px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="agenda-wrapper">
+
+    <!-- Seção Informativa -->
+
+    <!-- Seção de Filtros -->
+    <div class="filter-section">
+        <div class="filter-group">
+            <label class="filter-label">📅 Data</label>
+            <input type="date" id="filterData" class="filter-input" placeholder="Filtrar por data" value="{{ hoje }}" min="{{ hoje }}">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">👤 Nome</label>
+            <input type="text" id="filterNome" class="filter-input" placeholder="Filtrar por nome">
+        </div>
+        <div class="filter-group">
+            <label class="filter-label">📍 Local</label>
+            <select id="filterLocal" class="filter-select">
+                <option value="">Todos os locais</option>
+                <option value="Sala de Reunião">Sala de Reunião</option>
+                <option value="TO3">TO3</option>
+                <option value="Mezanino">Mezanino</option>
+                <option value="Supex">Supex</option>
+                <option value="Sala Diretoria Técnica">Sala Diretoria Técnica</option>
+                <option value="Anfiteatro">Anfiteatro</option>
+                <option value="In Loco">In Loco</option>
+                <option value="COREME">COREME</option>
+                <option value="Sala de Reanimação">Sala de Reanimação</option>
+                <option value="Online">Online</option>
+                <option value="SES">SES</option>
+                <option value="Escola de Saúde">Escola de Saúde</option>
+                <option value="HECAD">HECAD</option>
+                <option value="Sala de Estabilização Ambulatório">Sala de Estabilização Ambulatório</option>
+                <option value="Núcleo B">Núcleo B</option>
+                <option value="Núcleo C">Núcleo C</option>
+                <option value="Núcleo D">Núcleo D</option>
+                <option value="Outros">Outros</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button class="btn-filter" onclick="aplicarFiltros()">🔍 Filtrar</button>
+            <button class="btn-filter-clear" onclick="limparFiltros()">✕ Limpar</button>
+        </div>
+    </div>
+
+    <!-- Cabeçalho -->
+    <div class="agenda-header">
+        <div class="row">
+            <div class="col-2">Status</div>
+            <div class="col-2">Data</div>
+            <div class="col-2">Reservado por</div>
+            <div class="col-2">Horário</div>
+            <div class="col-2">Local</div>
+            <div class="col-2">Evento</div>
+            <div class="col-2">Ações</div>
+        </div>
+    </div>
+
+    <!-- Lista de reservas -->
+    <div id="agenda-body">
+    {% if reservas and reservas|length > 0 %}
+        {% for reserva in reservas %}
+            <div class="agenda-item" data-data="{{ reserva.data.isoformat() }}" data-nome="{{ reserva.reservado_por|lower }}" data-local="{{ reserva.local }}">
+                <!-- Status -->
+                <div class="agenda-status">
+                    {% if reserva.confirmado %}
+                    <span class="status-badge status-confirmada">✓ Confirmada</span>
+                    {% else %}
+                    <span class="status-badge status-cancelada">✕ Cancelada</span>
+                    {% endif %}
+                </div>
+
+                <!-- Data -->
+                <div class="agenda-date">
+                    <div class="agenda-date-full">
+                        {{ reserva.data|traduzir_data_pt }}
+                    </div>
+                </div>
+
+                <!-- Reservado por -->
+                <div class="agenda-reservado-por">
+                    <div class="agenda-reservado-nome">
+                        {{ reserva.reservado_por }}
+                    </div>
+                    <!-- Se quiser, pode mostrar mais info aqui (setor, e-mail, etc.) -->
+                    <div class="agenda-reservado-extra">
+                        Reserva registrada
+                    </div>
+                </div>
+
+                <!-- Horário -->
+                <div class="agenda-horario">
+                    <div class="agenda-horario-label">
+                        Horário
+                    </div>
+                    <div class="agenda-horario-range">
+                        {{ reserva.hora_inicio.strftime('%H:%M') }}
+                        -
+                        {{ reserva.hora_fim.strftime('%H:%M') }}
+                    </div>
+                </div>
+
+                <!-- Local -->
+                <div class="agenda-local">
+                    {{ reserva.local }}
+                </div>
+
+                <!-- Evento -->
+                <div class="agenda-evento">
+                    <div class="agenda-evento-label">Evento</div>
+                    <div>
+                        {% if reserva.evento %}
+                            <span>{{ reserva.evento }}</span>
+                        {% else %}
+                            <span style="color: #999; font-style: italic;">Não informado</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Ações -->
+                <div class="agenda-acoes">
+                    {% if reserva.participantes %}
+                    <button type="button" class="btn-participantes" onclick="exibirParticipantes('{{ reserva.evento }}', `{{ reserva.participantes }}`)">
+                        <i class="fas fa-users"></i> Participantes
+                    </button>
+                    {% else %}
+                    <span style="color: #999; font-size: 0.85rem;">-</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="agenda-empty no-results">
+            <i class="fas fa-calendar-Check" style="font-size: 2.5rem; color: #ddd; margin-bottom: 16px; display: block;"></i>
+            <strong>Nenhuma reunião agendada</strong>
+            <p style="margin-top: 8px; color: #999; font-size: 0.9rem;">Não há reuniões confirmadas a partir de hoje</p>
+        </div>
+    {% endif %}
+    </div>
+
+    <!-- Controle de Paginação -->
+    <div id="paginationContainer" class="pagination-container" style="display: none;">
+        <button class="pagination-btn" id="prevBtn" onclick="previousPage()" disabled>← Anterior</button>
+        <div id="pageNumbers"></div>
+        <button class="pagination-btn" id="nextBtn" onclick="nextPage()">Próximo →</button>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="agenda-actions">
+        <a href="{{ url_for('main.solicitar_reserva_sala') }}" class="btn btn-nova-reserva">
+            <i class="fas fa-plus"></i> Nova Reserva
+        </a>
+        <a href="{{ url_for('main.solicitar_cancelamento_reserva') }}" class="btn" style="background-color: #ef4444; border-color: #ef4444; color: white; font-weight: 500; margin-left: 8px;">
+            <i class="fas fa-ban"></i> Solicitar Cancelamento
+        </a>
+        <a href="{{ url_for('main.gerenciar_solicitacoes') }}" class="btn" style="background-color: #6c757d; border-color: #6c757d; color: white; font-weight: 500; margin-left: 8px;">
+            <i class="fas fa-tasks"></i> Gerenciar Solicitações
+        </a>
+    </div>
+
+</div>
+
+<!-- Bootstrap JS (opcional para esta tela) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Bootstrap JS (opcional para esta tela) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Modal de Participantes -->
+<div id="modalParticipantes" class="modal-participantes">
+    <div class="modal-conteudo">
+        <div class="modal-header">
+            <h2 class="modal-titulo">Participantes</h2>
+            <button class="modal-fechar" onclick="fecharModal()">×</button>
+        </div>
+        <div class="modal-info">
+            <div class="modal-info-label">Evento</div>
+            <div class="modal-info-valor" id="eventoNome">-</div>
+        </div>
+        <div class="modal-info">
+            <div class="modal-info-label">Lista de Participantes</div>
+            <ul class="participantes-lista" id="participantesList"></ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ITEMS_PER_PAGE = 6;
+    let currentPage = 1;
+    let totalPages = 1;
+
+    function updatePagination() {
+        const items = document.querySelectorAll('.agenda-item');
+        const filteredItems = Array.from(items).filter(item => item.dataset.filtered !== 'false');
+        
+        totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE) || 1;
+        currentPage = Math.max(1, Math.min(currentPage, totalPages));
+
+        // Mostrar/esconder items baseado na página atual
+        filteredItems.forEach((item, index) => {
+            const pageNum = Math.floor(index / ITEMS_PER_PAGE) + 1;
+            item.style.display = pageNum === currentPage ? 'grid' : 'none';
+        });
+
+        // Mostrar/esconder controle de paginação
+        const paginationContainer = document.getElementById('paginationContainer');
+        if (totalPages > 1) {
+            paginationContainer.style.display = 'flex';
+            updatePageNumbers();
+            document.getElementById('prevBtn').disabled = currentPage === 1;
+            document.getElementById('nextBtn').disabled = currentPage === totalPages;
+        } else {
+            paginationContainer.style.display = 'none';
+        }
+    }
+
+    function updatePageNumbers() {
+        const pageNumbersDiv = document.getElementById('pageNumbers');
+        pageNumbersDiv.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement('button');
+            btn.className = `pagination-btn ${i === currentPage ? 'active' : ''}`;
+            btn.textContent = i;
+            btn.onclick = () => goToPage(i);
+            pageNumbersDiv.appendChild(btn);
+        }
+    }
+
+    function goToPage(pageNum) {
+        currentPage = pageNum;
+        updatePagination();
+        window.scrollTo({ top: document.querySelector('.agenda-wrapper').offsetTop - 20, behavior: 'smooth' });
+    }
+
+    function nextPage() {
+        if (currentPage < totalPages) {
+            goToPage(currentPage + 1);
+        }
+    }
+
+    function previousPage() {
+        if (currentPage > 1) {
+            goToPage(currentPage - 1);
+        }
+    }
+
+    function exibirParticipantes(evento, participantesText) {
+        const modal = document.getElementById('modalParticipantes');
+        document.getElementById('eventoNome').textContent = evento;
+        
+        const participantesList = document.getElementById('participantesList');
+        participantesList.innerHTML = '';
+        
+        // Dividir por quebra de linha
+        const participantes = participantesText.split('\n').filter(p => p.trim() !== '');
+        
+        if (participantes.length === 0) {
+            participantesList.innerHTML = '<li class="participantes-vazio">Nenhum participante registrado</li>';
+        } else {
+            participantes.forEach(participante => {
+                const li = document.createElement('li');
+                li.textContent = participante.trim();
+                participantesList.appendChild(li);
+            });
+        }
+        
+        modal.classList.add('ativo');
+    }
+
+    function fecharModal() {
+        const modal = document.getElementById('modalParticipantes');
+        modal.classList.remove('ativo');
+    }
+
+    // Fechar modal ao clicar fora
+    document.getElementById('modalParticipantes').addEventListener('click', function(event) {
+        if (event.target === this) {
+            fecharModal();
+        }
+    });
+
+    // Fechar modal com tecla ESC
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            fecharModal();
+        }
+    });
+
+    function aplicarFiltros() {
+        const filterData = document.getElementById('filterData').value;
+        const filterNome = document.getElementById('filterNome').value.toLowerCase();
+        const filterLocal = document.getElementById('filterLocal').value;
+
+        const items = document.querySelectorAll('.agenda-item');
+        let hasVisibleItems = false;
+
+        items.forEach(item => {
+            const itemData = item.getAttribute('data-data');
+            const itemNome = item.getAttribute('data-nome');
+            const itemLocal = item.getAttribute('data-local');
+
+            let mostrar = true;
+
+            // Filtro por data
+            if (filterData && itemData !== filterData) {
+                mostrar = false;
+            }
+
+            // Filtro por nome (substring match)
+            if (filterNome && !itemNome.includes(filterNome)) {
+                mostrar = false;
+            }
+
+            // Filtro por local
+            if (filterLocal && itemLocal !== filterLocal) {
+                mostrar = false;
+            }
+
+            if (mostrar) {
+                item.dataset.filtered = 'true';
+                hasVisibleItems = true;
+            } else {
+                item.dataset.filtered = 'false';
+                item.style.display = 'none';
+            }
+        });
+
+        // Mostra mensagem de nenhum resultado se não houver items visíveis
+        const agendaBody = document.getElementById('agenda-body');
+        let noResultsDiv = document.querySelector('.no-results.hidden-msg');
+
+        if (!hasVisibleItems) {
+            if (!noResultsDiv) {
+                noResultsDiv = document.createElement('div');
+                noResultsDiv.className = 'agenda-empty no-results hidden-msg';
+                noResultsDiv.textContent = 'Nenhuma reserva encontrada com esses critérios de filtro.';
+                agendaBody.appendChild(noResultsDiv);
+            }
+            noResultsDiv.style.display = 'block';
+        } else {
+            if (noResultsDiv) {
+                noResultsDiv.style.display = 'none';
+            }
+        }
+
+        currentPage = 1;
+        updatePagination();
+    }
+
+    function limparFiltros() {
+        document.getElementById('filterData').value = '';
+        document.getElementById('filterNome').value = '';
+        document.getElementById('filterLocal').value = '';
+
+        const items = document.querySelectorAll('.agenda-item');
+        items.forEach(item => {
+            item.style.display = 'grid';
+        });
+
+        const noResultsDiv = document.querySelector('.no-results.hidden-msg');
+        if (noResultsDiv) {
+            noResultsDiv.style.display = 'none';
+        }
+
+        currentPage = 1;
+        updatePagination();
+    }
+
+    // Permitir aplicar filtros ao pressionar Enter
+    document.getElementById('filterData').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') aplicarFiltros();
+    });
+    document.getElementById('filterNome').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') aplicarFiltros();
+    });
+    document.getElementById('filterLocal').addEventListener('change', aplicarFiltros);
+
+    // Inicializar paginação ao carregar a página
+    document.addEventListener('DOMContentLoaded', function() {
+        // inicialmente marque todos como filtrados e aplique filtro padrão
+        const items = document.querySelectorAll('.agenda-item');
+        items.forEach(item => item.dataset.filtered = 'true');
+        updatePagination();
+        aplicarFiltros();
+    });
+</script>
+</body>
+</html>

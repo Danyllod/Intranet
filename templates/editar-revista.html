@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Revista - CRESM</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .editor-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-actions button,
+        .header-actions a {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-voltar {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-voltar:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .pages-list {
+            margin-bottom: 30px;
+        }
+
+        .pages-list h2 {
+            color: white;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pages-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .page-thumbnail {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .page-thumbnail:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-thumbnail.active {
+            border: 3px solid #667eea;
+        }
+
+        .page-thumbnail img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .page-thumbnail .page-number {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .btn-add-page {
+            background: white;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-direction: column;
+            gap: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .btn-add-page:hover {
+            background: #f0f0ff;
+            border-color: #764ba2;
+            color: #764ba2;
+        }
+
+        .editor-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .editor-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .editor-section h2 i {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input[type="file"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 150px;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .file-input-label i {
+            font-size: 32px;
+        }
+
+        .preview-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .preview-section h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .preview-image {
+            width: 100%;
+            border-radius: 8px;
+            max-height: 400px;
+            object-fit: contain;
+            border: 2px solid #e0e0e0;
+            background: #f8f9fa;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .page-actions button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #28a745;
+        }
+
+        .success-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-left: 4px solid #dc3545;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .editor-section {
+                padding: 20px;
+            }
+
+            .pages-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="editor-container">
+        <!-- Header -->
+        <div class="header">
+            <h1><i class="fas fa-magazine" style="color: #667eea;"></i> Editor de Revista</h1>
+            <div class="header-actions">
+                <a href="{{ url_for('main.revista') }}" class="btn-voltar">
+                    <i class="fas fa-eye"></i> Visualizar
+                </a>
+                <button class="btn-save" onclick="salvarRevista()">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </div>
+        </div>
+
+        <!-- Mensagem de Sucesso -->
+        <div class="success-message" id="successMessage">
+            <i class="fas fa-check-circle"></i> Revista salva com sucesso!
+        </div>
+
+        <!-- Mensagem de Erro -->
+        <div class="error-message" id="errorMessage">
+            <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+        </div>
+
+        <!-- Gerenciamento de Índices -->
+        <div class="editor-section">
+            <h2><i class="fas fa-list"></i> Gerenciar Edições (Índices)</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Lista de Índices -->
+                <div>
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Edições Disponíveis</h3>
+                    <div id="indicesList" style="display: flex; flex-direction: column; gap: 10px; max-height: 400px; overflow-y: auto;">
+                        <!-- Índices serão adicionados aqui dinamicamente -->
+                    </div>
+                    <button onclick="novoIndice()" style="width: 100%; margin-top: 15px; padding: 12px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#764ba2'" onmouseout="this.style.background='#667eea'">
+                        <i class="fas fa-plus"></i> Novo Índice
+                    </button>
+                </div>
+
+                <!-- Painel de Edição do Índice -->
+                <div id="indiceEditPanel" style="display: none; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 2px solid #e0e0e0;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">Editar Edição</h3>
+                    <div class="form-group">
+                        <label>Nome da Edição</label>
+                        <input type="text" id="indiceNome" placeholder="Ex: Fevereiro" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" />
+                    </div>
+                    <div class="form-group">
+                        <label>ID da Edição</label>
+                        <input type="text" id="indiceId" placeholder="Ex: fevereiro" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" />
+                    </div>
+                    <div class="form-group">
+                        <label>Mês (número)</label>
+                        <input type="number" id="indiceMes" placeholder="Ex: 2" min="1" max="12" style="width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px;" />
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="salvarIndice()" style="flex: 1; padding: 10px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">
+                            <i class="fas fa-save"></i> Salvar
+                        </button>
+                        <button onclick="deletarIndice()" style="flex: 1; padding: 10px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+                            <i class="fas fa-trash"></i> Deletar
+                        </button>
+                        <button onclick="cancelarEdicaoIndice()" style="flex: 1; padding: 10px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.background='#5a6268'" onmouseout="this.style.background='#6c757d'">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Páginas -->
+        <div class="pages-list">
+            <h2><i class="fas fa-file-image"></i> Páginas da Revista</h2>
+            <div class="pages-container" id="pagesContainer">
+                <!-- Páginas serão adicionadas aqui dinamicamente -->
+            </div>
+        </div>
+
+        <!-- Editor da Página Selecionada -->
+        <div class="editor-section" id="editorSection" style="display: none;">
+            <h2 id="pageTitle"><i class="fas fa-edit"></i> Editar Página</h2>
+            
+            <div class="form-group">
+                <label>Imagem da Página (PNG)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="pageImageInput" accept="image/png" onchange="handleImageUpload(event)">
+                    <label class="file-input-label" for="pageImageInput">
+                        <div>
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <div>Clique para selecionar ou arraste uma imagem PNG</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <h3>Pré-visualização</h3>
+                <img id="pageImagePreview" src="" alt="Preview" class="preview-image" style="display: none;">
+                <div id="noImagePlaceholder" style="text-align: center; padding: 40px; color: #999;">
+                    <i class="fas fa-image" style="font-size: 48px; margin-bottom: 10px;"></i>
+                    <p>Nenhuma imagem selecionada</p>
+                </div>
+            </div>
+
+            <div class="page-actions">
+                <button class="btn-delete" onclick="deletarPagina()" id="deletePageBtn">
+                    <i class="fas fa-trash"></i> Deletar Página
+                </button>
+            </div>
+        </div>
+
+        <!-- Botão para adicionar página -->
+        <div class="pages-list" style="margin-top: 30px;">
+            <button onclick="adicionarPagina()" class="btn-add-page" style="width: 100%; height: auto; padding: 40px;">
+                <i class="fas fa-plus" style="font-size: 32px;"></i>
+                <span>Adicionar Nova Página</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let paginasRevista = [];
+        let paginaSelecionada = null;
+        let indices = [];
+        let indiceSelecionado = null;
+        let novoIndiceFlag = false;
+        let viewsData = {};
+
+        // Carregar páginas ao inicializar
+        function carregarPaginas() {
+            fetch('/api/carregar-paginas-revista')
+                .then(response => response.json())
+                .then(data => {
+                    paginasRevista = data.pages || [];
+                    renderizarPaginas();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar páginas:', error);
+                    mostrarErro('Erro ao carregar as páginas da revista');
+                });
+        }
+
+        // Carregar índices ao inicializar
+        function carregarIndices() {
+            fetch('/api/carregar-edicoes')
+                .then(response => response.json())
+                .then(data => {
+                    indices = data.edicoes || [];
+                    carregarVisualizacoes();
+                    renderizarIndices();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar índices:', error);
+                    mostrarErro('Erro ao carregar as edições');
+                });
+        }
+
+        // Carregar dados de visualizações
+        function carregarVisualizacoes() {
+            fetch('/api/carregar-visualizacoes')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        viewsData = data.visualizacoes || {};
+                        renderizarIndices();
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar visualizações:', error);
+                });
+        }
+
+        // Renderizar lista de índices
+        function renderizarIndices() {
+            const container = document.getElementById('indicesList');
+            container.innerHTML = '';
+
+            if (indices.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">Nenhuma edição criada ainda</p>';
+                return;
+            }
+
+            indices.forEach((indice, index) => {
+                const div = document.createElement('div');
+                div.className = 'indice-item' + (indiceSelecionado === index ? ' selected' : '');
+                div.style.cssText = `
+                    padding: 12px;
+                    background: white;
+                    border: 2px solid ${indiceSelecionado === index ? '#667eea' : '#e0e0e0'};
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                `;
+                div.onmouseover = function() {
+                    if (indiceSelecionado !== index) {
+                        this.style.borderColor = '#667eea';
+                    }
+                };
+                div.onmouseout = function() {
+                    if (indiceSelecionado !== index) {
+                        this.style.borderColor = '#e0e0e0';
+                    }
+                };
+                div.onclick = () => selecionarIndice(index);
+                
+                // Obter visualizações da edição
+                const views = viewsData[indice.id] || 0;
+                
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <div style="font-weight: 600; color: #333;">${indice.nome}</div>
+                            <div style="font-size: 12px; color: #999;">${indice.id}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: #999;">Visualizações</div>
+                            <div style="font-weight: 700; color: #667eea; font-size: 14px;">${views}</div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Selecionar índice para editar
+        function selecionarIndice(index) {
+            indiceSelecionado = index;
+            novoIndiceFlag = false;
+            const indice = indices[index];
+
+            document.getElementById('indiceNome').value = indice.nome;
+            document.getElementById('indiceId').value = indice.id;
+            document.getElementById('indiceMes').value = indice.mes;
+
+            document.getElementById('indiceEditPanel').style.display = 'block';
+            renderizarIndices();
+        }
+
+        // Criar novo índice
+        function novoIndice() {
+            indiceSelecionado = null;
+            novoIndiceFlag = true;
+
+            document.getElementById('indiceNome').value = '';
+            document.getElementById('indiceId').value = '';
+            document.getElementById('indiceMes').value = '';
+
+            document.getElementById('indiceEditPanel').style.display = 'block';
+            renderizarIndices();
+        }
+
+        // Salvar índice
+        function salvarIndice() {
+            const nome = document.getElementById('indiceNome').value.trim();
+            const id = document.getElementById('indiceId').value.trim();
+            const mes = parseInt(document.getElementById('indiceMes').value);
+
+            if (!nome || !id || !mes || mes < 1 || mes > 12) {
+                mostrarErro('Por favor, preencha todos os campos corretamente');
+                return;
+            }
+
+            if (novoIndiceFlag) {
+                // Novo índice
+                indices.push({
+                    id: id,
+                    nome: nome,
+                    mes: mes
+                });
+            } else if (indiceSelecionado !== null) {
+                // Editar índice existente
+                indices[indiceSelecionado] = {
+                    id: id,
+                    nome: nome,
+                    mes: mes
+                };
+            }
+
+            // Salvar no backend
+            fetch('/api/salvar-edicoes', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ edicoes: indices })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarSucesso('Edição salva com sucesso!');
+                    indiceSelecionado = null;
+                    carregarIndices();
+                    document.getElementById('indiceEditPanel').style.display = 'none';
+                } else {
+                    mostrarErro(data.error || 'Erro ao salvar a edição');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar:', error);
+                mostrarErro('Erro ao salvar a edição: ' + error.message);
+            });
+        }
+
+        // Deletar índice
+        function deletarIndice() {
+            if (indiceSelecionado === null) {
+                mostrarErro('Selecione uma edição para deletar');
+                return;
+            }
+
+            if (confirm(`Tem certeza que deseja deletar "${indices[indiceSelecionado].nome}"?`)) {
+                indices.splice(indiceSelecionado, 1);
+                indiceSelecionado = null;
+
+                // Salvar no backend
+                fetch('/api/salvar-edicoes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ edicoes: indices })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        mostrarSucesso('Edição deletada com sucesso!');
+                        carregarIndices();
+                        document.getElementById('indiceEditPanel').style.display = 'none';
+                    } else {
+                        mostrarErro(data.error || 'Erro ao deletar a edição');
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao deletar:', error);
+                    mostrarErro('Erro ao deletar a edição: ' + error.message);
+                });
+            }
+        }
+
+        // Cancelar edição de índice
+        function cancelarEdicaoIndice() {
+            indiceSelecionado = null;
+            novoIndiceFlag = false;
+            document.getElementById('indiceEditPanel').style.display = 'none';
+            renderizarIndices();
+        }
+
+        // Carregar páginas ao inicializar
+        function carregarPaginas() {
+            fetch('/api/carregar-paginas-revista')
+                .then(response => response.json())
+                .then(data => {
+                    paginasRevista = data.pages || [];
+                    renderizarPaginas();
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar páginas:', error);
+                    mostrarErro('Erro ao carregar as páginas da revista');
+                });
+        }
+
+        // Renderizar lista de páginas
+        function renderizarPaginas() {
+            const container = document.getElementById('pagesContainer');
+            container.innerHTML = '';
+
+            paginasRevista.forEach((pagina, index) => {
+                const div = document.createElement('div');
+                div.className = 'page-thumbnail' + (paginaSelecionada === index ? ' active' : '');
+                div.onclick = () => selecionarPagina(index);
+
+                const img = document.createElement('img');
+                img.src = pagina.image || '{{ url_for("static", filename="imagens/placeholder.png") }}';
+                img.alt = `Página ${index + 1}`;
+
+                const pageNum = document.createElement('div');
+                pageNum.className = 'page-number';
+                pageNum.textContent = index + 1;
+
+                div.appendChild(img);
+                div.appendChild(pageNum);
+                container.appendChild(div);
+            });
+        }
+
+        // Selecionar página para editar
+        function selecionarPagina(index) {
+            paginaSelecionada = index;
+            const pagina = paginasRevista[index];
+
+            document.getElementById('pageTitle').innerHTML = `<i class="fas fa-edit"></i> Editar Página ${index + 1}`;
+            
+            const preview = document.getElementById('pageImagePreview');
+            const placeholder = document.getElementById('noImagePlaceholder');
+
+            if (pagina.image) {
+                preview.src = pagina.image;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+
+            document.getElementById('pageImageInput').value = '';
+            document.getElementById('editorSection').style.display = 'block';
+            renderizarPaginas();
+
+            // Rolar para o editor
+            document.getElementById('editorSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Adicionar nova página
+        function adicionarPagina() {
+            paginasRevista.push({
+                image: null
+            });
+            selecionarPagina(paginasRevista.length - 1);
+        }
+
+        // Deletar página
+        function deletarPagina() {
+            if (paginaSelecionada === null) return;
+            
+            if (confirm('Tem certeza que deseja deletar esta página?')) {
+                paginasRevista.splice(paginaSelecionada, 1);
+                paginaSelecionada = null;
+                document.getElementById('editorSection').style.display = 'none';
+                renderizarPaginas();
+            }
+        }
+
+        // Processar upload de imagem
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Validar se é PNG
+            if (file.type !== 'image/png') {
+                mostrarErro('Por favor, selecione uma imagem PNG válida');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                paginasRevista[paginaSelecionada].image = e.target.result;
+                
+                const preview = document.getElementById('pageImagePreview');
+                const placeholder = document.getElementById('noImagePlaceholder');
+                
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Salvar revista
+        function salvarRevista() {
+            if (paginasRevista.length === 0) {
+                mostrarErro('A revista deve ter pelo menos uma página');
+                return;
+            }
+
+            const dadosRevista = {
+                pages: paginasRevista
+            };
+
+            fetch('/api/salvar-revista', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dadosRevista)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarSucesso('Revista salva com sucesso!');
+                } else {
+                    mostrarErro(data.error || 'Erro ao salvar a revista');
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao salvar:', error);
+                mostrarErro('Erro ao salvar a revista: ' + error.message);
+            });
+        }
+
+        // Mostrar mensagem de sucesso
+        function mostrarSucesso(mensagem) {
+            const successMsg = document.getElementById('successMessage');
+            successMsg.textContent = mensagem;
+            successMsg.classList.add('show');
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        // Mostrar mensagem de erro
+        function mostrarErro(mensagem) {
+            const errorMsg = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = mensagem;
+            errorMsg.classList.add('show');
+            setTimeout(() => {
+                errorMsg.classList.remove('show');
+            }, 3000);
+        }
+
+        // Inicializar
+        carregarPaginas();
+        carregarIndices();
+    </script>
+</body>
+</html>

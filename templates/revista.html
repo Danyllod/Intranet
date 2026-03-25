@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revista CRESM - Retrospectiva 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body>
+    <a href="{{ url_for('main.jornal') }}" class="btn-voltar">
+        <i class="fas fa-arrow-left"></i> Voltar
+    </a>
+
+    <!-- Container da Revista -->
+    <div class="revista-container">
+        <div class="revista-wrapper">
+            <!-- Livro (Revista) - Será renderizado dinamicamente -->
+            <div class="revista-book" id="revistaBook">
+                <!-- Páginas serão carregadas aqui dinamicamente via JavaScript -->
+            </div>
+            </div>
+
+            <!-- Controles de Navegação -->
+            <div class="revista-controls">
+                <button class="control-btn prev-btn" id="prevBtn" onclick="previousPage()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <div class="page-counter">
+                    <span id="currentPage">1</span> / <span id="totalPages">6</span>
+                </div>
+                <button class="control-btn next-btn" id="nextBtn" onclick="nextPage()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2b2b2b 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+        }
+
+        .btn-voltar {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 196, 255, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 196, 255, 0.3);
+        }
+
+        .btn-voltar:hover {
+            background-color: #00c4ff;
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 196, 255, 0.5);
+            color: white;
+        }
+
+        .btn-editar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(27, 94, 60, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(27, 94, 60, 0.3);
+        }
+
+        .btn-editar:hover {
+            background-color: #1b5e3c;
+            transform: translateX(5px);
+            box-shadow: 0 6px 20px rgba(27, 94, 60, 0.5);
+            color: white;
+        }
+
+        .revista-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .revista-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 100%;
+        }
+
+        .revista-book {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            perspective: 1000px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .revista-page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            padding: 60px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            opacity: 0;
+            transform: scale(0.95) rotateY(90deg);
+            pointer-events: none;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+            touch-action: pan-y;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .revista-page.active {
+            opacity: 1;
+            transform: scale(1) rotateY(0deg);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .revista-page.prev {
+            transform: scale(0.95) rotateY(-90deg);
+        }
+
+        .page-image {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .page-content {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .page-content h1 {
+            font-size: 2.5rem;
+            color: #1b5e3c;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .page-content h2 {
+            font-size: 2rem;
+            color: #1b5e3c;
+            margin-bottom: 30px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .page-content h3 {
+            color: #00c4ff;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .page-content h4 {
+            color: #1b5e3c;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .page-content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .page-content hr {
+            border-color: #ddd;
+            margin: 20px 0;
+        }
+
+        .highlights {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .highlight-item {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(27, 94, 60, 0.1) 0%, rgba(0, 196, 255, 0.1) 100%);
+            border-radius: 8px;
+            border-left: 4px solid #00c4ff;
+        }
+
+        .highlight-item i {
+            font-size: 2rem;
+            color: #00c4ff;
+            margin-bottom: 10px;
+        }
+
+        .highlight-item h4 {
+            color: #1b5e3c;
+            margin: 10px 0;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #1b5e3c 0%, #00c4ff 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-box h3 {
+            font-size: 2.5rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .stat-box p {
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .project {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0, 196, 255, 0.05);
+            border-left: 4px solid #00c4ff;
+            border-radius: 4px;
+        }
+
+        .project h4 {
+            color: #1b5e3c;
+        }
+
+        .back-cover {
+            background: linear-gradient(135deg, #1b5e3c 0%, #2b2b2b 100%);
+            color: white;
+            text-align: center;
+            justify-content: flex-end;
+            padding-bottom: 80px;
+        }
+
+        .back-cover h3 {
+            font-size: 2.5rem;
+            color: #00c4ff;
+            margin-bottom: 10px;
+        }
+
+        .back-cover p {
+            color: #ccc;
+        }
+
+        .contact-info {
+            margin-top: 30px;
+            font-size: 0.95rem;
+        }
+
+        .contact-info p {
+            margin: 8px 0;
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            font-size: 0.9rem;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .revista-controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 30px;
+            border-radius: 50px;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background-color: #00c4ff;
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background-color: #1b5e3c;
+            transform: scale(1.1);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-counter {
+            color: white;
+            font-weight: 600;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .revista-container {
+                padding: 10px;
+            }
+
+            .revista-page {
+                padding: 40px 30px;
+            }
+
+            .page-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .page-content h2 {
+                font-size: 1.5rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .highlights {
+                flex-direction: column;
+            }
+
+            .btn-voltar {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            .revista-controls {
+                gap: 10px;
+                padding: 10px 20px;
+            }
+
+            .control-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+            }
+
+            .page-counter {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .edicoes-sidebar {
+                width: 180px;
+            }
+
+            .revista-container {
+                padding-left: 200px;
+            }
+
+            .sidebar-header h3 {
+                font-size: 1.1rem;
+            }
+
+            .edicao-item {
+                padding: 12px 15px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        .revista-page::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .revista-page::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .revista-page::-webkit-scrollbar-thumb {
+            background: #00c4ff;
+            border-radius: 10px;
+        }
+
+        .revista-page::-webkit-scrollbar-thumb:hover {
+            background: #1b5e3c;
+        }
+    </style>
+
+    <script>
+        let currentPageIndex = 0;
+        let pages = [];
+
+        // Carregar páginas do servidor
+        async function carregarPaginas() {
+            try {
+                const response = await fetch('/api/carregar-paginas-revista');
+                const data = await response.json();
+                
+                if (data.success) {
+                    pages = data.pages;
+                    renderizarPaginas();
+                } else {
+                    console.error('Erro ao carregar páginas:', data.error);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar páginas:', error);
+            }
+        }
+
+        // Renderizar páginas dinamicamente
+        function renderizarPaginas() {
+            const book = document.getElementById('revistaBook');
+            book.innerHTML = '';
+
+            pages.forEach((page, index) => {
+                const pageDiv = document.createElement('div');
+                pageDiv.className = 'revista-page';
+                pageDiv.setAttribute('data-page', index + 1);
+
+                if (page.image) {
+                    // Se é uma imagem PNG
+                    const img = document.createElement('img');
+                    img.src = page.image;
+                    img.alt = `Página ${index + 1}`;
+                    img.className = 'page-image';
+                    pageDiv.appendChild(img);
+                } else {
+                    // Página vazia
+                    pageDiv.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #999;"><p>Página sem conteúdo</p></div>';
+                }
+
+                const pageIndicator = document.createElement('div');
+                pageIndicator.className = 'page-indicator';
+                pageIndicator.textContent = index + 1;
+                pageDiv.appendChild(pageIndicator);
+
+                book.appendChild(pageDiv);
+            });
+
+            // Atualizar controles
+            const totalPages = pages.length;
+            document.getElementById('totalPages').textContent = totalPages;
+            updatePages();
+        }
+
+        // Atualizar página
+        function updatePages() {
+            const pagesList = document.querySelectorAll('.revista-page');
+            pagesList.forEach((page, index) => {
+                page.classList.remove('active', 'prev');
+                if (index === currentPageIndex) {
+                    page.classList.add('active');
+                } else if (index < currentPageIndex) {
+                    page.classList.add('prev');
+                }
+            });
+
+            document.getElementById('currentPage').textContent = currentPageIndex + 1;
+            document.getElementById('prevBtn').disabled = currentPageIndex === 0;
+            document.getElementById('nextBtn').disabled = currentPageIndex === pages.length - 1;
+        }
+
+        function nextPage() {
+            if (currentPageIndex < pages.length - 1) {
+                currentPageIndex++;
+                updatePages();
+            }
+        }
+
+        function previousPage() {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                updatePages();
+            }
+        }
+
+        // Controle com teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextPage();
+            if (e.key === 'ArrowLeft') previousPage();
+        });
+
+        // Controle com swipe em mobile
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            
+            const deltaX = touchStartX - touchEndX;
+            const deltaY = touchStartY - touchEndY;
+            
+            // Verificar se o gesto é horizontal (mudança de página)
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (deltaX > 50) nextPage();
+                if (deltaX < -50) previousPage();
+            }
+            // Para gestos verticais, permitir scroll natural da página
+        });
+
+        // Carregar páginas ao inicializar
+        carregarPaginas();
+        
+        // Registrar visualização da edição
+        const urlParams = new URLSearchParams(window.location.search);
+        const edicaoAtual = urlParams.get('edicao') || 'janeiro 2026';
+        
+        fetch('/api/registrar-visualizacao', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ edicao_id: edicaoAtual })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('[INFO] Visualização registrada');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao registrar visualização:', error);
+        });
+    </script>
+</body>
+</html>

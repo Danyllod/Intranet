@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Solicitar Cancelamento" }}</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    >
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fb 0%, #e8ecf1 100%);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            flex-grow: 1;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .btn-back {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .form-wrapper {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e9edf5;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.15);
+        }
+
+        .reserva-info {
+            background-color: #f9fafc;
+            border-left: 4px solid #007bff;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        .reserva-info-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reserva-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9edf5;
+            font-size: 0.9rem;
+        }
+
+        .reserva-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .reserva-info-label {
+            color: #666;
+        }
+
+        .reserva-info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        @media (max-width: 576px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #e9edf5;
+        }
+
+        .btn-cancel {
+            background-color: #f5f7fb;
+            border: 2px solid #e9edf5;
+            color: #333;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e9edf5;
+            border-color: #d9dff5;
+            color: #000;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 12px  rgba(104, 159, 243, 0.4);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(104, 159, 243, 0.4);
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 24px;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            color: #c3185b;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #22c55e;
+        }
+
+        .alert-danger .btn-close,
+        .alert-success .btn-close {
+            filter: opacity(0.7);
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+
+        .success-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .success-subtext {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .btn-return {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-return:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            color: white;
+        }
+
+        .warning-box {
+            background-color: #fff3e0;
+            border-left: 4px solid #f57c00;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .warning-icon {
+            color: #f57c00;
+            font-size: 1.3rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .warning-content {
+            flex-grow: 1;
+        }
+
+        .warning-title {
+            font-weight: 600;
+            color: #e65100;
+            margin-bottom: 4px;
+        }
+
+        .warning-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Estilos para o Modal de Seleção */
+        .modal-reservas {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-reservas.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content-reservas {
+            background-color: white;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header-reservas {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .modal-title-reservas {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-close-reservas {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close-reservas:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body-reservas {
+            padding: 24px;
+        }
+
+        .reserva-card {
+            background: linear-gradient(135deg, #f9fafc 0%, #f0f3f9 100%);
+            border: 2px solid #e9edf5;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reserva-card:hover {
+            border-color:  rgba(104, 159, 243, 0.4);
+            box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #fff9f9 0%, #fff0f0 100%);
+        }
+
+        .reserva-card-info {
+            flex-grow: 1;
+        }
+
+        .reserva-card-data {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .reserva-card-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .reserva-card-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .reserva-card-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .reserva-card-pessoa {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reserva-card-select-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            margin-left: 12px;
+        }
+
+        .reserva-card-select-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .no-reservas {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .no-reservas-icon {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 12px;
+        }
+
+        .btn-select-reserva {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;   
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-select-reserva:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .reserva-selecionada-info {
+            background-color: #fff3f0;
+            border: 2px solid #ef4444;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .reserva-selecionada-texto {
+            flex-grow: 1;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .reserva-selecionada-valor {
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        .reserva-selecionada-trocar {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 600;
+            padding: 0;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .reserva-selecionada-trocar:hover {
+            color: rgba(104, 159, 243, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-title">
+            <h1><i class="fas fa-ban"></i> Solicitar Cancelamento</h1>
+            <p class="header-subtitle">Cancelar uma reserva de sala aprovada</p>
+        </div>
+        <a href="{{ url_for('main.agenda_salas') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Agenda
+        </a>
+    </div>
+</div>
+
+<div class="form-wrapper">
+    {% if sucesso %}
+    <div class="success-message">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="success-text">Solicitação Enviada com Sucesso!</div>
+        <p class="success-subtext">Sua solicitação de cancelamento foi enviada para análise. Os administradores analisarão sua solicitação.</p>
+        <a href="{{ url_for('main.agenda_salas') }}" class="btn-return">
+            <i class="fas fa-arrow-left"></i> Voltar para Agenda
+        </a>
+    </div>
+    {% elif erro %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> <strong>Erro!</strong> {{ erro }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <a href="{{ url_for('main.agenda_salas') }}" class="btn-return" style="display: inline-flex;">
+        <i class="fas fa-arrow-left"></i> Voltar para Agenda
+    </a>
+    {% else %}
+    <div class="warning-box">
+        <div class="warning-icon">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <div class="warning-content">
+            <div class="warning-title">Atenção</div>
+            <div class="warning-text">
+                Solicitar o cancelamento de uma reserva requer aprovação. Sua solicitação será analisada pelos administradores.
+            </div>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('main.solicitar_cancelamento_reserva') }}">
+        <!-- Informações da Reserva -->
+        {% if reserva %}
+        <div class="reserva-info">
+            <div class="reserva-info-title">
+                <i class="fas fa-calendar-check"></i> Informações da Reserva
+            </div>
+            <div class="reserva-info-item">
+                <span class="reserva-info-label">Data:</span>
+                <span class="reserva-info-value">{{ reserva.data|traduzir_data_pt }}</span>
+            </div>
+            <div class="reserva-info-item">
+                <span class="reserva-info-label">Horário:</span>
+                <span class="reserva-info-value">{{ reserva.hora_inicio.strftime('%H:%M') }} - {{ reserva.hora_fim.strftime('%H:%M') }}</span>
+            </div>
+            <div class="reserva-info-item">
+                <span class="reserva-info-label">Local:</span>
+                <span class="reserva-info-value">{{ reserva.local }}</span>
+            </div>
+            {% if reserva.evento %}
+            <div class="reserva-info-item">
+                <span class="reserva-info-label">Evento:</span>
+                <span class="reserva-info-value">{{ reserva.evento }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <input type="hidden" name="reserva_id" value="{{ reserva.id }}">
+        {% else %}
+        <!-- Seleção de Reserva com Modal -->
+        <div class="form-section">
+            <label class="form-label"><i class="fas fa-search"></i> Selecione a Reserva</label>
+            
+            <!-- Display da Reserva Selecionada -->
+            <div id="reserva-selecionada" style="display: none;">
+                <div class="reserva-selecionada-info">
+                    <div>
+                        <div class="reserva-selecionada-texto">Reserva selecionada:</div>
+                        <div class="reserva-selecionada-valor" id="reserva-display">-</div>
+                    </div>
+                    <button type="button" class="reserva-selecionada-trocar" onclick="abrirModalReservas()">
+                        <i class="fas fa-edit"></i> Trocar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Campo Hidden para armazenar ID da reserva -->
+            <input type="hidden" id="reserva_id" name="reserva_id" required>
+
+            <!-- Botão para abrir modal -->
+            <button type="button" class="btn-select-reserva" onclick="abrirModalReservas()">
+                <i class="fas fa-folder-open"></i> Clique para Selecionar uma Reserva
+            </button>
+        </div>
+
+        <!-- Modal de Seleção de Reserva -->
+        <div id="modalReservas" class="modal-reservas">
+            <div class="modal-content-reservas">
+                <div class="modal-header-reservas">
+                    <h2 class="modal-title-reservas">
+                        <i class="fas fa-calendar-alt"></i> Suas Reservas
+                    </h2>
+                    <button type="button" class="modal-close-reservas" onclick="fecharModalReservas()">
+                        ×
+                    </button>
+                </div>
+                <div class="modal-body-reservas">
+                    {% if reservas and reservas|length > 0 %}
+                        {% for res in reservas %}
+                        <div class="reserva-card" onclick="selecionarReserva({{ res.id }}, '{{ res.data|traduzir_data_pt }}', '{{ res.local }}', '{{ res.hora_inicio.strftime('%H:%M') }}', '{{ res.hora_fim.strftime('%H:%M') }}', '{{ res.reservado_por }}', '{{ res.evento or 'Sem evento' }}')">
+                            <div class="reserva-card-info">
+                                <div class="reserva-card-data">
+                                    <div class="reserva-card-field">
+                                        <span class="reserva-card-label"><i class="fas fa-calendar"></i> Data</span>
+                                        <span class="reserva-card-value">{{ res.data|traduzir_data_pt }}</span>
+                                    </div>
+                                    <div class="reserva-card-field">
+                                        <span class="reserva-card-label"><i class="fas fa-clock"></i> Horário</span>
+                                        <span class="reserva-card-value">{{ res.hora_inicio.strftime('%H:%M') }} - {{ res.hora_fim.strftime('%H:%M') }}</span>
+                                    </div>
+                                    <div class="reserva-card-field">
+                                        <span class="reserva-card-label"><i class="fas fa-map-marker-alt"></i> Local</span>
+                                        <span class="reserva-card-value">{{ res.local }}</span>
+                                    </div>
+                                    <div class="reserva-card-field">
+                                        <span class="reserva-card-label"><i class="fas fa-file-alt"></i> Evento</span>
+                                        <span class="reserva-card-value">{{ res.evento or '-' }}</span>
+                                    </div>
+                                </div>
+                                <div class="reserva-card-pessoa">
+                                    <i class="fas fa-user-circle"></i>
+                                    <strong>{{ res.reservado_por }}</strong>
+                                </div>
+                            </div>
+                            <button type="button" class="reserva-card-select-btn">
+                                <i class="fas fa-check-circle"></i> Selecionar
+                            </button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-reservas">
+                            <div class="no-reservas-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <p><strong>Nenhuma reserva disponível</strong></p>
+                            <p>Você não tem reservas aprovadas a partir de hoje</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Nome do Solicitante -->
+        <div class="form-section">
+            <label for="solicitante" class="form-label"><i class="fas fa-user"></i> Seu Nome</label>
+            <input 
+                type="text" 
+                id="solicitante" 
+                name="solicitante" 
+                class="form-control" 
+                placeholder="Digite seu nome completo"
+                value="{{ request.form.get('solicitante', '') }}"
+                required
+            >
+        </div>
+
+        <!-- Ações -->
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="window.location.href='{{ url_for('main.agenda_salas') }}'">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Enviar Solicitação
+            </button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Funções para gerenciar o modal de seleção de reserva
+    function abrirModalReservas() {
+        document.getElementById('modalReservas').classList.add('show');
+    }
+
+    function fecharModalReservas() {
+        document.getElementById('modalReservas').classList.remove('show');
+    }
+
+    function selecionarReserva(id, data, local, horarioInicio, horarioFim, reservadoPor, evento) {
+        // Preenche o campo hidden
+        document.getElementById('reserva_id').value = id;
+
+        // Atualiza a exibição da reserva selecionada
+        const dataDisplay = `${data} • ${local} (${horarioInicio}-${horarioFim}) • ${reservadoPor}`;
+        document.getElementById('reserva-display').textContent = dataDisplay;
+        document.getElementById('reserva-selecionada').style.display = 'block';
+        document.querySelector('.btn-select-reserva').style.display = 'none';
+
+        // Fecha o modal
+        fecharModalReservas();
+
+        // Scroll para o próximo campo
+        setTimeout(() => {
+            document.getElementById('solicitante').focus();
+        }, 300);
+    }
+
+    // Fechar modal ao clicar fora dele
+    window.onclick = function(event) {
+        const modal = document.getElementById('modalReservas');
+        if (event.target === modal) {
+            fecharModalReservas();
+        }
+    }
+
+    // Tecla ESC para fechar modal
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            fecharModalReservas();
+        }
+    });
+</script>
+</body>
+</html>

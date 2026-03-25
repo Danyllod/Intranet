@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title or "Solicitar Reserva de Sala" }}</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    >
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fb 0%, #e8ecf1 100%);
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            flex-grow: 1;
+        }
+
+        .header-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .btn-back {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .btn-back:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        .form-wrapper {
+            max-width: 600px;
+            margin: 0 auto 40px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .form-control,
+        .form-select {
+            border: 2px solid #e9edf5;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        }
+
+        .row-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        @media (max-width: 576px) {
+            .row-group {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid #e9edf5;
+        }
+
+        .btn-cancel {
+            background-color: #f5f7fb;
+            border: 2px solid #e9edf5;
+            color: #333;
+            padding: 12px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background-color: #e9edf5;
+            border-color: #d9dff5;
+            color: #000;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 24px;
+        }
+
+        .alert-danger {
+            background-color: #fff5f5;
+            color: #c3185b;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            color: #22c55e;
+        }
+
+        .alert-danger .btn-close,
+        .alert-success .btn-close {
+            filter: opacity(0.7);
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #22c55e;
+            margin-bottom: 20px;
+        }
+
+        .success-text {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .success-subtext {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        .btn-return {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-return:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-title">
+            <h1><i class="fas fa-file-invoice"></i> Solicitar Reserva de Sala</h1>
+            <p class="header-subtitle">Sua solicitação será analisada pelos administradores</p>
+        </div>
+        <a href="{{ url_for('main.agenda_salas') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Agenda
+        </a>
+    </div>
+</div>
+
+<div class="form-wrapper">
+    {% if sucesso %}
+    <div class="success-message">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="success-text">Solicitação Enviada com Sucesso!</div>
+        <p class="success-subtext">Sua solicitação de reserva foi enviada para análise. Você será notificado quando ela for aprovada ou negada.</p>
+        <a href="{{ url_for('main.agenda_salas') }}" class="btn-return">
+            <i class="fas fa-arrow-left"></i> Voltar para Agenda
+        </a>
+    </div>
+    {% else %}
+    <form method="POST" action="{{ url_for('main.solicitar_reserva_sala') }}">
+        {% if erro %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> <strong>Erro de Conflito!</strong> {{ erro }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <!-- Data -->
+        <div class="form-section">
+            <label for="data" class="form-label"><i class="fas fa-calendar"></i> Data</label>
+            <input
+                type="date"
+                class="form-control"
+                id="data"
+                name="data"
+                value="{{ formulario_data.data if formulario_data else '' }}"
+                min="{{ hoje }}"
+                required
+            >
+        </div>
+
+        <!-- Horários -->
+        <div class="row-group">
+            <div class="form-section">
+                <label for="hora_inicio" class="form-label"><i class="fas fa-clock"></i> Hora de início</label>
+                <input
+                    type="time"
+                    class="form-control"
+                    id="hora_inicio"
+                    name="hora_inicio"
+                    value="{{ formulario_data.hora_inicio if formulario_data else '' }}"
+                    required
+                >
+            </div>
+            <div class="form-section">
+                <label for="hora_fim" class="form-label"><i class="fas fa-clock"></i> Hora de fim</label>
+                <input
+                    type="time"
+                    class="form-control"
+                    id="hora_fim"
+                    name="hora_fim"
+                    value="{{ formulario_data.hora_fim if formulario_data else '' }}"
+                    required
+                >
+            </div>
+        </div>
+        <div id="timeError" style="color: #c3185b; font-size:0.9rem; margin-top: -16px; margin-bottom: 20px; display:none;">
+            O horário de início deve ser anterior ao horário de fim.
+        </div>
+
+        <!-- Reservado por -->
+        <div class="form-section">
+            <label for="reservado_por" class="form-label"><i class="fas fa-user"></i> Seu Nome</label>
+            <input
+                type="text"
+                class="form-control"
+                id="reservado_por"
+                name="reservado_por"
+                placeholder="Digite o seu nome"
+                value="{{ formulario_data.reservado_por if formulario_data else '' }}"
+                required
+            >
+        </div>
+
+        <!-- Local (sala) -->
+        <div class="form-section">
+            <label for="local" class="form-label"><i class="fas fa-door-open"></i> Local (sala)</label>
+            <select
+                class="form-select"
+                id="local"
+                name="local"
+                required
+            >
+                <option value="" selected disabled>Selecione uma sala</option>
+                <option value="Sala de Reunião" {% if formulario_data and formulario_data.local == 'Sala de Reunião' %}selected{% endif %}>Sala de Reunião</option>
+                <option value="TO3" {% if formulario_data and formulario_data.local == 'TO3' %}selected{% endif %}>TO3</option>
+                <option value="Mezanino" {% if formulario_data and formulario_data.local == 'Mezanino' %}selected{% endif %}>Mezanino</option>
+                <option value="Supex" {% if formulario_data and formulario_data.local == 'Supex' %}selected{% endif %}>Supex</option>
+                <option value="Sala Diretoria Técnica" {% if formulario_data and formulario_data.local == 'Sala Diretoria Técnica' %}selected{% endif %}>Sala Diretoria Técnica</option>
+                <option value="Anfiteatro" {% if formulario_data and formulario_data.local == 'Anfiteatro' %}selected{% endif %}>Anfiteatro</option>
+                <option value="In Loco" {% if formulario_data and formulario_data.local == 'In Loco' %}selected{% endif %}>In Loco</option>
+                <option value="COREME" {% if formulario_data and formulario_data.local == 'COREME' %}selected{% endif %}>COREME</option>
+                <option value="Sala de Reanimação" {% if formulario_data and formulario_data.local == 'Sala de Reanimação' %}selected{% endif %}>Sala de Reanimação</option>
+                <option value="Online" {% if formulario_data and formulario_data.local == 'Online' %}selected{% endif %}>Online</option>
+                <option value="SES" {% if formulario_data and formulario_data.local == 'SES' %}selected{% endif %}>SES</option>
+                <option value="Escola de Saúde" {% if formulario_data and formulario_data.local == 'Escola de Saúde' %}selected{% endif %}>Escola de Saúde</option>
+                <option value="HECAD" {% if formulario_data and formulario_data.local == 'HECAD' %}selected{% endif %}>HECAD</option>
+                <option value="Sala de Estabilização Ambulatório" {% if formulario_data and formulario_data.local == 'Sala de Estabilização Ambulatório' %}selected{% endif %}>Sala de Estabilização Ambulatório</option>
+                <option value="Núcleo A" {% if formulario_data and formulario_data.local == 'Núcleo B' %}selected{% endif %}>Núcleo B</option>
+                <option value="Núcleo B" {% if formulario_data and formulario_data.local == 'Núcleo C' %}selected{% endif %}>Núcleo C</option>
+                <option value="Núcleo C" {% if formulario_data and formulario_data.local == 'Núcleo D' %}selected{% endif %}>Núcleo D</option>
+                <option value="Outros" {% if formulario_data and formulario_data.local == 'Outros' %}selected{% endif %}>Outros</option>
+            </select>
+        </div>
+
+        <!-- Evento -->
+        <div class="form-section">
+            <label for="evento" class="form-label"><i class="fas fa-calendar-alt"></i> Nome do Evento</label>
+            <input
+                type="text"
+                class="form-control"
+                id="evento"
+                name="evento"
+                placeholder="Ex: Workshop de Saúde Mental"
+                value="{{ formulario_data.evento if formulario_data else '' }}"
+            >
+        </div>
+
+        <!-- Participantes -->
+        <div class="form-section">
+            <label for="participantes" class="form-label"><i class="fas fa-users"></i> Participantes</label>
+            <textarea
+                class="form-control"
+                id="participantes"
+                name="participantes"
+                rows="4"
+                placeholder="Digite os nomes dos participantes (um por linha)"
+            >{{ formulario_data.participantes if formulario_data else '' }}</textarea>
+            <small style="color: #777; margin-top: 6px; display: block;">Separe cada participante em uma nova linha</small>
+        </div>
+
+        <!-- Botões -->
+        <div class="form-actions">
+            <a href="{{ url_for('main.agenda_salas') }}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-paper-plane"></i> Enviar Solicitação
+            </button>
+        </div>
+    </form>
+    {% endif %}
+</div>
+
+    <script>
+        function checkTimeOrder() {
+            const start = document.getElementById('hora_inicio').value;
+            const end = document.getElementById('hora_fim').value;
+            const errorDiv = document.getElementById('timeError');
+            const submitBtn = document.querySelector('.btn-submit');
+
+            if (start && end && start >= end) {
+                errorDiv.style.display = 'block';
+                if (submitBtn) submitBtn.disabled = true;
+            } else {
+                errorDiv.style.display = 'none';
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        }
+
+        document.getElementById('hora_inicio').addEventListener('change', checkTimeOrder);
+        document.getElementById('hora_fim').addEventListener('change', checkTimeOrder);
+
+        // if page loads with prefilled values, validate immediately
+        document.addEventListener('DOMContentLoaded', checkTimeOrder);
+    </script>
+</html>
