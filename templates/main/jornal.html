@@ -19,7 +19,7 @@
     </div>
 
     <!-- Botão para abrir revista -->
-    <a href="{{ url_for('main.revista') }}" class="btn-revista">
+    <a href="{{ url_for('revista.revista') }}" class="btn-revista">
         <i class="fas fa-book"></i>
         <span>Ler como Revista</span>
     </a>
@@ -313,7 +313,7 @@
             edicaoAtual = edicaoId;
             
             // Navegar para revista com edição selecionada
-            window.location.href = `{{ url_for('main.revista') }}?edicao=${edicaoId}`;
+            window.location.href = `{{ url_for('revista.revista') }}?edicao=${edicaoId}`;
         }
 
         // Controle do sidebar removido - sempre visível

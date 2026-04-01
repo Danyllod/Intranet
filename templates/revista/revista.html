@@ -446,7 +446,7 @@
         // Carregar páginas do servidor
         async function carregarPaginas() {
             try {
-                const response = await fetch('/api/carregar-paginas-revista');
+                const response = await fetch('/revista/api/carregar-paginas');
                 const data = await response.json();
                 
                 if (data.success) {
@@ -564,7 +564,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const edicaoAtual = urlParams.get('edicao') || 'janeiro 2026';
         
-        fetch('/api/registrar-visualizacao', {
+        fetch('/revista/api/registrar-visualizacao', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

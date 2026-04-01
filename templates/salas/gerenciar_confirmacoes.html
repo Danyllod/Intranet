@@ -305,7 +305,7 @@
             <h1><i class="fas fa-check-circle"></i> Gerenciar Confirmações</h1>
             <p class="header-subtitle">Confirme ou cancele as reuniões aprovadas</p>
         </div>
-        <a href="{{ url_for('main.gerenciar_solicitacoes') }}" class="btn-back">
+        <a href="{{ url_for('salas.gerenciar_solicitacoes') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i> Voltar
         </a>
     </div>
@@ -393,13 +393,13 @@
 
                 <!-- Ações -->
                 <div class="confirmacao-acoes">
-                    <form method="POST" action="{{ url_for('main.confirmar_reuniao', id=reuniao.id) }}" style="display: inline;">
+                    <form method="POST" action="{{ url_for('salas.confirmar_reuniao', id=reuniao.id) }}" style="display: inline;">
                         <button type="submit" class="btn-confirmar" title="Confirmar reunião">
                             <i class="fas fa-check"></i> Confirmar
                         </button>
                     </form>
 
-                    <form method="POST" action="{{ url_for('main.cancelar_reuniao', id=reuniao.id) }}" style="display: inline;">
+                    <form method="POST" action="{{ url_for('salas.cancelar_reuniao', id=reuniao.id) }}" style="display: inline;">
                         <button type="submit" class="btn-cancelar" title="Cancelar reunião">
                             <i class="fas fa-times"></i> Cancelar
                         </button>

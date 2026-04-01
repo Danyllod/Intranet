@@ -356,7 +356,7 @@
         <div class="header">
             <h1><i class="fas fa-magazine" style="color: #667eea;"></i> Editor de Revista</h1>
             <div class="header-actions">
-                <a href="{{ url_for('main.revista') }}" class="btn-voltar">
+                <a href="{{ url_for('revista.revista') }}" class="btn-voltar">
                     <i class="fas fa-eye"></i> Visualizar
                 </a>
                 <button class="btn-save" onclick="salvarRevista()">
@@ -481,7 +481,7 @@
 
         // Carregar páginas ao inicializar
         function carregarPaginas() {
-            fetch('/api/carregar-paginas-revista')
+            fetch('/revista/api/carregar-paginas')
                 .then(response => response.json())
                 .then(data => {
                     paginasRevista = data.pages || [];
@@ -495,7 +495,7 @@
 
         // Carregar índices ao inicializar
         function carregarIndices() {
-            fetch('/api/carregar-edicoes')
+            fetch('/revista/api/carregar-edicoes')
                 .then(response => response.json())
                 .then(data => {
                     indices = data.edicoes || [];
@@ -510,7 +510,7 @@
 
         // Carregar dados de visualizações
         function carregarVisualizacoes() {
-            fetch('/api/carregar-visualizacoes')
+            fetch('/revista/api/carregar-visualizacoes')
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -630,7 +630,7 @@
             }
 
             // Salvar no backend
-            fetch('/api/salvar-edicoes', {
+            fetch('/revista/api/salvar-edicoes', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -666,7 +666,7 @@
                 indiceSelecionado = null;
 
                 // Salvar no backend
-                fetch('/api/salvar-edicoes', {
+                fetch('/revista/api/salvar-edicoes', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -700,7 +700,7 @@
 
         // Carregar páginas ao inicializar
         function carregarPaginas() {
-            fetch('/api/carregar-paginas-revista')
+            fetch('/revista/api/carregar-paginas')
                 .then(response => response.json())
                 .then(data => {
                     paginasRevista = data.pages || [];
@@ -819,7 +819,7 @@
                 pages: paginasRevista
             };
 
-            fetch('/api/salvar-revista', {
+            fetch('/revista/api/salvar-revista', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

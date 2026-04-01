@@ -570,7 +570,7 @@
             <h1><i class="fas fa-ban"></i> Solicitar Cancelamento</h1>
             <p class="header-subtitle">Cancelar uma reserva de sala aprovada</p>
         </div>
-        <a href="{{ url_for('main.agenda_salas') }}" class="btn-back">
+        <a href="{{ url_for('salas.agenda_salas') }}" class="btn-back">
             <i class="fas fa-arrow-left"></i> Agenda
         </a>
     </div>
@@ -584,7 +584,7 @@
         </div>
         <div class="success-text">Solicitação Enviada com Sucesso!</div>
         <p class="success-subtext">Sua solicitação de cancelamento foi enviada para análise. Os administradores analisarão sua solicitação.</p>
-        <a href="{{ url_for('main.agenda_salas') }}" class="btn-return">
+        <a href="{{ url_for('salas.agenda_salas') }}" class="btn-return">
             <i class="fas fa-arrow-left"></i> Voltar para Agenda
         </a>
     </div>
@@ -593,7 +593,7 @@
         <i class="fas fa-exclamation-circle"></i> <strong>Erro!</strong> {{ erro }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <a href="{{ url_for('main.agenda_salas') }}" class="btn-return" style="display: inline-flex;">
+    <a href="{{ url_for('salas.agenda_salas') }}" class="btn-return" style="display: inline-flex;">
         <i class="fas fa-arrow-left"></i> Voltar para Agenda
     </a>
     {% else %}
@@ -609,7 +609,7 @@
         </div>
     </div>
 
-    <form method="POST" action="{{ url_for('main.solicitar_cancelamento_reserva') }}">
+    <form method="POST" action="{{ url_for('salas.solicitar_cancelamento_reserva') }}">
         <!-- Informações da Reserva -->
         {% if reserva %}
         <div class="reserva-info">
@@ -738,7 +738,7 @@
 
         <!-- Ações -->
         <div class="form-actions">
-            <button type="button" class="btn-cancel" onclick="window.location.href='{{ url_for('main.agenda_salas') }}'">
+            <button type="button" class="btn-cancel" onclick="window.location.href='{{ url_for('salas.agenda_salas') }}'">
                 <i class="fas fa-times"></i> Cancelar
             </button>
             <button type="submit" class="btn-submit">

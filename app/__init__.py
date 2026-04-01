@@ -18,8 +18,17 @@ def create_app():
     db.init_app(app)
     
     # Registrar blueprints
-    from app.routes import main_bp
+    from app.main import main_bp
+    from app.revista import revista_bp
+    from app.salas import salas_bp
+    from app.senhas import senhas_bp
+    from app.auth import auth_bp
+    
     app.register_blueprint(main_bp)
+    app.register_blueprint(revista_bp)
+    app.register_blueprint(salas_bp)
+    app.register_blueprint(senhas_bp)
+    app.register_blueprint(auth_bp)
     
     # Criar tabelas
     with app.app_context():

@@ -55,9 +55,9 @@
                                 <i class="fas fa-calendar"></i> Agenda
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ url_for('main.agenda_salas') }}">Visualizar</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.solicitar_reserva_sala') }}">Reserva</a></li>
-                                <li><a class="dropdown-item" href="{{ url_for('main.solicitar_cancelamento_reserva') }}">Cancelamento</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('salas.agenda_salas') }}">Visualizar</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('salas.solicitar_reserva_sala') }}">Reserva</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('salas.solicitar_cancelamento_reserva') }}">Cancelamento</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
@@ -99,7 +99,7 @@
                         <li><a href="#" class="text-decoration-none text-white-50">Esportes</a></li>
                         <li><a href="#" class="text-decoration-none text-white-50">Entretenimento</a></li>
                     </ul>
-                    <a href="{{ url_for('main.agenda_salas') }}" class="btn btn-sm btn-outline-light mt-3">
+                    <a href="{{ url_for('salas.agenda_salas') }}" class="btn btn-sm btn-outline-light mt-3">
                         <i class="fas fa-calendar-alt"></i> Acessar Agenda
                     </a>
                 </div>

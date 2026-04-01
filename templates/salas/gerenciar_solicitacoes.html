@@ -478,23 +478,23 @@
         
         <div class="controls">
             {% if not incluir_historico %}
-            <form method="GET" action="{{ url_for('main.gerenciar_solicitacoes') }}" style="display: inline;">
+            <form method="GET" action="{{ url_for('salas.gerenciar_solicitacoes') }}" style="display: inline;">
                 <input type="hidden" name="historico" value="true">
                 <button type="submit" class="btn-control btn-historico">
                     <i class="fas fa-history"></i> Ver Histórico
                 </button>
             </form>
             {% else %}
-            <a href="{{ url_for('main.gerenciar_solicitacoes') }}" class="btn-control btn-pendentes">
+            <a href="{{ url_for('salas.gerenciar_solicitacoes') }}" class="btn-control btn-pendentes">
                 <i class="fas fa-hourglass-half"></i> Apenas Pendentes
             </a>
             {% endif %}
 
-            <a href="{{ url_for('main.gerenciar_confirmacoes') }}" class="btn-control btn-confirmacoes">
+            <a href="{{ url_for('salas.gerenciar_confirmacoes') }}" class="btn-control btn-confirmacoes">
                 <i class="fas fa-check-circle"></i> Gerenciar Confirmações
             </a>
             
-            <a href="{{ url_for('main.agenda_salas') }}" class="btn-control" style="background-color: #6c757d; color: white;">
+            <a href="{{ url_for('salas.agenda_salas') }}" class="btn-control" style="background-color: #6c757d; color: white;">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>
@@ -553,7 +553,7 @@
 
                     <div class="solicitacao-acoes">
                         {% if solicitacao.status == 'pendente' %}
-                        <form method="POST" action="{{ url_for('main.aprovar_solicitacao', id=solicitacao.id) }}" style="display: inline;">
+                        <form method="POST" action="{{ url_for('salas.aprovar_solicitacao', id=solicitacao.id) }}" style="display: inline;">
                             <input type="hidden" name="aprovado_por" value="Admin">
                             <button type="submit" class="btn-aprovar" title="Aprovar solicitação">
                                 <i class="fas fa-check"></i> Aprovar
@@ -578,7 +578,7 @@
                                         <h5 class="modal-title">Motivo da Negação</h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <form method="POST" action="{{ url_for('main.negar_solicitacao', id=solicitacao.id) }}">
+                                    <form method="POST" action="{{ url_for('salas.negar_solicitacao', id=solicitacao.id) }}">
                                         <div class="modal-body">
                                             <label for="motivo{{ solicitacao.id }}" class="form-label">Explique o motivo da negação</label>
                                             <textarea 
@@ -720,7 +720,7 @@
 
                     <div class="solicitacao-acoes">
                         {% if cancelamento.status == 'pendente' %}
-                        <form method="POST" action="{{ url_for('main.aprovar_cancelamento', id=cancelamento.id) }}" style="display: inline;">
+                        <form method="POST" action="{{ url_for('salas.aprovar_cancelamento', id=cancelamento.id) }}" style="display: inline;">
                             <input type="hidden" name="aprovado_por" value="Admin">
                             <button type="submit" class="btn-aprovar" title="Aprovar cancelamento">
                                 <i class="fas fa-check"></i> Aprovar
@@ -743,7 +743,7 @@
                                         <h5 class="modal-title">Motivo da Negação</h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <form method="POST" action="{{ url_for('main.negar_cancelamento', id=cancelamento.id) }}">
+                                    <form method="POST" action="{{ url_for('salas.negar_cancelamento', id=cancelamento.id) }}">
                                         <div class="modal-body">
                                             <label for="motivoNegar{{ cancelamento.id }}" class="form-label">Explique o motivo da negação</label>
                                             <textarea 
