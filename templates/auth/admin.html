@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar de Navegação -->
+        <div class="col-md-3 col-lg-2 mb-4">
+            <div class="list-group sticky-top" style="top: 20px;">
+                <h5 class="list-group-item bg-dark text-white fw-bold">
+                    <i class="fas fa-cog"></i> Menu
+                </h5>
+                <a href="{{ url_for('auth.admin') }}" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-users"></i> Gerenciar Usuários
+                </a>
+                <a href="{{ url_for('senhas.relatorios') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-chart-bar"></i> Relatórios
+                </a>
+                <a href="{{ url_for('senhas.recepcao') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-ticket-alt"></i> Recepção
+                </a>
+                <a href="{{ url_for('senhas.atendimento') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-headset"></i> Atendimento
+                </a>
+                <a href="{{ url_for('senhas.painel') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tv"></i> Painel
+                </a>
+                <div class="list-group-item bg-light">
+                    <hr class="my-2">
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="col-md-9 col-lg-10">
+            <!-- Mensagens Flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-users"></i> Gerenciamento de Usuários
+                </h2>
+                <a href="{{ url_for('auth.novo_usuario_form') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Novo Usuário
+                </a>
+            </div>
+            
+            <!-- Tabela de Usuários -->
+            <div class="card shadow">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Usuário</th>
+                                <th>Email</th>
+                                <th>Função</th>
+                                <th>Status</th>
+                                <th>Criado em</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if usuarios.items %}
+                                {% for user in usuarios.items %}
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-user-circle"></i>
+                                            <strong>{{ user.username }}</strong>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if user.is_admin() %}
+                                                <span class="badge bg-danger">Admin</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Básico</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if user.ativo %}
+                                                <span class="badge bg-success">Ativo</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                {{ user.criado_em.strftime('%d/%m/%Y %H:%M') }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{{ url_for('auth.editar_usuario_form', user_id=user.id) }}" 
+                                                   class="btn btn-outline-primary" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form method="POST" 
+                                                      action="{{ url_for('auth.toggle_ativo_usuario', user_id=user.id) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-warning" 
+                                                            title="{% if user.ativo %}Desativar{% else %}Ativar{% endif %}"
+                                                            onclick="return confirm('Tem certeza?')">
+                                                        {% if user.ativo %}
+                                                            <i class="fas fa-lock"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-unlock"></i>
+                                                        {% endif %}
+                                                    </button>
+                                                </form>
+                                                <form method="POST" 
+                                                      action="{{ url_for('auth.deletar_usuario', user_id=user.id) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" 
+                                                            class="btn btn-outline-danger" 
+                                                            title="Deletar"
+                                                            onclick="return confirm('Tem certeza que deseja deletar este usuário?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox"></i> Nenhum usuário básico encontrado
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Paginação -->
+            {% if usuarios.pages > 1 %}
+                <nav aria-label="Paginação" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if usuarios.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('auth.admin', page=usuarios.prev_num) }}">
+                                    <i class="fas fa-chevron-left"></i> Anterior
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link"><i class="fas fa-chevron-left"></i> Anterior</span>
+                            </li>
+                        {% endif %}
+                        
+                        {% for page_num in usuarios.iter_pages() %}
+                            {% if page_num %}
+                                {% if page_num == usuarios.page %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('auth.admin', page=page_num) }}">
+                                            {{ page_num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if usuarios.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('auth.admin', page=usuarios.next_num) }}">
+                                    Próximo <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Próximo <i class="fas fa-chevron-right"></i></span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

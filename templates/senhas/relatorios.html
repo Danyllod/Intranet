@@ -1,0 +1,1015 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar de Navegação -->
+        <div class="col-md-2 mb-4">
+            <div class="list-group sticky-top" style="top: 20px;">
+                <h5 class="list-group-item bg-dark text-white fw-bold">
+                    <i class="fas fa-bars"></i> Menu
+                </h5>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.is_admin() %}
+                        <a href="{{ url_for('auth.admin') }}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-users"></i> Gerenciar Usuários
+                        </a>
+                        <a href="{{ url_for('senhas.relatorios') }}" class="list-group-item list-group-item-action active">
+                            <i class="fas fa-chart-bar"></i> Relatórios
+                        </a>
+                    {% endif %}
+                    <a href="{{ url_for('senhas.recepcao') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-ticket-alt"></i> Recepção
+                    </a>
+                    <a href="{{ url_for('senhas.atendimento') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-headset"></i> Atendimento
+                    </a>
+                    <a href="{{ url_for('senhas.painel') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tv"></i> Painel
+                    </a>
+                    <div class="list-group-item bg-light">
+                        <hr class="my-2">
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted">
+                            <i class="fas fa-user-circle"></i><br>
+                            {{ current_user.username }}<br>
+                            <span class="badge bg-info">{{ current_user.role|upper }}</span>
+                        </small>
+                    </div>
+                    <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('senhas.painel') }}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-tv"></i> Painel
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="list-group-item list-group-item-action text-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="col-md-10">
+            <h1 class="mb-4">📊 Relatórios - Painel de Senhas</h1>
+            
+            <!-- Abas de Tipo de Relatório -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tipo_relatorio == 'diario' %}active{% endif %}" 
+                            id="tab-diario" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#relatorio-diario" 
+                            type="button" 
+                            role="tab">
+                        📅 Relatório Diário
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tipo_relatorio == 'mensal' %}active{% endif %}" 
+                            id="tab-mensal" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#relatorio-mensal" 
+                            type="button" 
+                            role="tab">
+                        📈 Relatório Mensal
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Conteúdo das Abas -->
+            <div class="tab-content">
+                <!-- Relatório Diário -->
+                <div class="tab-pane fade {% if tipo_relatorio == 'diario' %}show active{% endif %}" id="relatorio-diario">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Relatório Diário</h5>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="data-diaria" class="form-label">Selecione a Data:</label>
+                                <input type="date" id="data-diaria" class="form-control" value="">
+                                <small class="text-muted">Data padrão: hoje</small>
+                            </div>
+                            
+                            <button id="btn-gerar-diario" class="btn btn-primary mb-4">
+                                <i class="fas fa-chart-bar"></i> Gerar Relatório
+                            </button>
+                            
+                            <div id="resultado-diario" style="display: none;">
+                                <!-- Banner com intervalo filtrado -->
+                                <div class="alert alert-info mb-4 border-start border-5" style="border-left-color: #0dcaf0 !important;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><strong>📅 Período Selecionado:</strong></h6>
+                                            <p class="mb-0 fs-6">
+                                                <span id="diario-data-filtro" class="badge bg-primary p-2">-</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-primary card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="diario" data-status="total">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Total de Senhas</h6>
+                                                <h3 class="text-primary mb-0" id="diario-total">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-success card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="diario" data-status="finalizadas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Finalizadas</h6>
+                                                <h3 class="text-success mb-0" id="diario-finalizadas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-danger card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="diario" data-status="canceladas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Canceladas</h6>
+                                                <h3 class="text-danger mb-0" id="diario-canceladas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-warning card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="diario" data-status="ausentes">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Ausentes</h6>
+                                                <h3 class="text-warning mb-0" id="diario-ausentes">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">Distribuição por Tipo de Consulta</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🆕 Primeira Consulta:</strong> <span id="diario-primeira_consulta" class="badge bg-info">0</span></p>
+                                                        <p class="mb-2"><strong>📝 Nova Consulta:</strong> <span id="diario-nova_consulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🔄 Retorno:</strong> <span id="diario-retorno" class="badge bg-info">0</span></p>
+                                                        <p class="mb-0"><strong>🤝 Interconsulta:</strong> <span id="diario-interconsulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Relatório Mensal -->
+                <div class="tab-pane fade {% if tipo_relatorio == 'mensal' %}show active{% endif %}" id="relatorio-mensal">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Relatório Mensal</h5>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="ano" class="form-label">Ano:</label>
+                                    <input type="number" id="ano" class="form-control" value="">
+                                    <small class="text-muted">Ano em números (ex: 2026)</small>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="mes" class="form-label">Mês:</label>
+                                    <select id="mes" class="form-select">
+                                        <option value="">Selecione o mês</option>
+                                        <option value="1">Janeiro</option>
+                                        <option value="2">Fevereiro</option>
+                                        <option value="3">Março</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Maio</option>
+                                        <option value="6">Junho</option>
+                                        <option value="7">Julho</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Setembro</option>
+                                        <option value="10">Outubro</option>
+                                        <option value="11">Novembro</option>
+                                        <option value="12">Dezembro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button id="btn-gerar-mensal" class="btn btn-success mb-4">
+                                <i class="fas fa-chart-line"></i> Gerar Relatório
+                            </button>
+                            
+                            <div id="resultado-mensal" style="display: none;">
+                                <!-- Banner com intervalo filtrado -->
+                                <div class="alert alert-success mb-4 border-start border-5" style="border-left-color: #198754 !important;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><strong>📅 Período Selecionado:</strong></h6>
+                                            <p class="mb-0 fs-6">
+                                                <span id="mensal-data-filtro" class="badge bg-success p-2">-</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-primary card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="mensal" data-status="total">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Total do Mês</h6>
+                                                <h3 class="text-primary mb-0" id="mensal-total">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-success card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="mensal" data-status="finalizadas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Finalizadas</h6>
+                                                <h3 class="text-success mb-0" id="mensal-finalizadas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-danger card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="mensal" data-status="canceladas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Canceladas</h6>
+                                                <h3 class="text-danger mb-0" id="mensal-canceladas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-warning card-clickable" style="cursor: pointer; transition: all 0.3s ease;" data-tipo="mensal" data-status="ausentes">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Ausentes</h6>
+                                                <h3 class="text-warning mb-0" id="mensal-ausentes">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">Distribuição por Tipo de Consulta</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🆕 Primeira Consulta:</strong> <span id="mensal-primeira_consulta" class="badge bg-info">0</span></p>
+                                                        <p class="mb-2"><strong>📝 Nova Consulta:</strong> <span id="mensal-nova_consulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🔄 Retorno:</strong> <span id="mensal-retorno" class="badge bg-info">0</span></p>
+                                                        <p class="mb-0"><strong>🤝 Interconsulta:</strong> <span id="mensal-interconsulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para exibir senhas -->
+<div class="modal fade" id="modalSenhas" tabindex="-1" aria-labelledby="modalsenhasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalsenhasLabel">Senhas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-sm" id="tabela-senhas">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Data/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-senhas">
+                        <tr><td colspan="4" class="text-center">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Data padrão de hoje
+const hoje = new Date().toISOString().split('T')[0];
+document.getElementById('data-diaria').value = hoje;
+
+// Ano e mês padrão
+const agora = new Date();
+document.getElementById('ano').value = agora.getFullYear();
+document.getElementById('mes').value = agora.getMonth() + 1;
+
+// Event listeners
+document.getElementById('btn-gerar-diario').addEventListener('click', carregarRelatorioDiario);
+document.getElementById('btn-gerar-mensal').addEventListener('click', carregarRelatorioMensal);
+
+// Cards clicáveis
+document.querySelectorAll('.card-clickable').forEach(card => {
+    card.addEventListener('click', abrirModalSenhas);
+});
+
+async function carregarRelatorioDiario() {
+    const dataInput = document.getElementById('data-diaria').value;
+    
+    const dataObj = new Date(dataInput + 'T00:00:00');
+    const dataFormatada = dataObj.toLocaleDateString('pt-BR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    try {
+        const url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${dataInput}`;
+        const response = await fetch(url);
+        const data_resp = await response.json();
+        
+        // Atualizar intervalo
+        document.getElementById('diario-data-filtro').textContent = `${dataFormatada}`;
+        
+        document.getElementById('diario-total').textContent = data_resp.total_senhas;
+        document.getElementById('diario-finalizadas').textContent = data_resp.finalizadas;
+        document.getElementById('diario-canceladas').textContent = data_resp.canceladas;
+        document.getElementById('diario-ausentes').textContent = data_resp.ausentes;
+        
+        // Distribuição por tipo
+        document.getElementById('diario-primeira_consulta').textContent = data_resp.por_tipo.primeira_consulta || 0;
+        document.getElementById('diario-nova_consulta').textContent = data_resp.por_tipo.nova_consulta || 0;
+        document.getElementById('diario-retorno').textContent = data_resp.por_tipo.retorno || 0;
+        document.getElementById('diario-interconsulta').textContent = data_resp.por_tipo.interconsulta || 0;
+        
+        document.getElementById('resultado-diario').style.display = 'block';
+        
+        // Guardar dados para modal
+        window.relatorioAtualDiario = data_resp;
+        window.filtroAtualData = dataInput;
+    } catch (error) {
+        console.error('Erro ao carregar relatório:', error);
+        alert('Erro ao gerar relatório diário');
+    }
+}
+
+async function carregarRelatorioMensal() {
+    const ano = document.getElementById('ano').value;
+    const mes = document.getElementById('mes').value;
+    
+    if (!ano || !mes) {
+        alert('Selecione ano e mês');
+        return;
+    }
+    
+    // Formatar período
+    const nomeMeses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const periodoFormatado = `${nomeMeses[mes]} de ${ano}`;
+    
+    try {
+        const url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${ano}&mes=${mes}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        // Atualizar intervalo
+        document.getElementById('mensal-data-filtro').textContent = `${periodoFormatado}`;
+        
+        document.getElementById('mensal-total').textContent = data.total_senhas;
+        document.getElementById('mensal-finalizadas').textContent = data.finalizadas;
+        document.getElementById('mensal-canceladas').textContent = data.canceladas;
+        document.getElementById('mensal-ausentes').textContent = data.ausentes;
+        
+        // Distribuição por tipo
+        document.getElementById('mensal-primeira_consulta').textContent = data.por_tipo.primeira_consulta || 0;
+        document.getElementById('mensal-nova_consulta').textContent = data.por_tipo.nova_consulta || 0;
+        document.getElementById('mensal-retorno').textContent = data.por_tipo.retorno || 0;
+        document.getElementById('mensal-interconsulta').textContent = data.por_tipo.interconsulta || 0;
+        
+        document.getElementById('resultado-mensal').style.display = 'block';
+        
+        // Guardar dados para modal
+        window.relatorioAtualMensal = data;
+        window.filtroAtualAno = ano;
+        window.filtroAtualMes = mes;
+    } catch (error) {
+        console.error('Erro ao carregar relatório:', error);
+        alert('Erro ao gerar relatório mensal');
+    }
+}
+
+async function abrirModalSenhas(event) {
+    const card = event.currentTarget;
+    const tipo = card.getAttribute('data-tipo');
+    const status = card.getAttribute('data-status');
+    
+    let url = '';
+    let titulo = '';
+    
+    if (tipo === 'diario') {
+        if (!window.filtroAtualData) return;
+        
+        if (status === 'total') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}`;
+            titulo = 'Todas as Senhas';
+        } else if (status === 'finalizadas') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}&status=finalizada`;
+            titulo = 'Senhas Finalizadas';
+        } else if (status === 'canceladas') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}&status=cancelada`;
+            titulo = 'Senhas Canceladas';
+        } else if (status === 'ausentes') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}&status=ausente`;
+            titulo = 'Senhas de Ausentes';
+        }
+    } else if (tipo === 'mensal') {
+        if (!window.filtroAtualAno || !window.filtroAtualMes) return;
+        
+        if (status === 'total') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}`;
+            titulo = 'Todas as Senhas do Mês';
+        } else if (status === 'finalizadas') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}&status=finalizada`;
+            titulo = 'Senhas Finalizadas do Mês';
+        } else if (status === 'canceladas') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}&status=cancelada`;
+            titulo = 'Senhas Canceladas do Mês';
+        } else if (status === 'ausentes') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}&status=ausente`;
+            titulo = 'Senhas de Ausentes do Mês';
+        }
+    }
+    
+    if (!url) return;
+    
+    try {
+        document.getElementById('modalsenhasLabel').textContent = titulo;
+        document.getElementById('tbody-senhas').innerHTML = '<tr><td colspan="4" class="text-center">Carregando...</td></tr>';
+        
+        const modal = new bootstrap.Modal(document.getElementById('modalSenhas'));
+        modal.show();
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        // Tipo mapping
+        const tipoMap = {
+            'primeira_consulta': '🆕 Primeira Consulta',
+            'nova_consulta': '📝 Nova Consulta',
+            'retorno': '🔄 Retorno',
+            'interconsulta': '🤝 Interconsulta'
+        };
+        
+        // Status mapping
+        const statusMap = {
+            'finalizada': '✅ Finalizada',
+            'cancelada': '❌ Cancelada',
+            'ausente': '⚠️ Ausente',
+            'chamada': '📢 Chamada',
+            'rechamada': '🔄 Rechamada'
+        };
+        
+        let senhas = [];
+        if (data.senhas) {
+            senhas = data.senhas;
+        } else if (data.ultimas) {
+            senhas = data.ultimas;
+        } else if (data.todas) {
+            senhas = data.todas;
+        }
+        
+        if (senhas && senhas.length > 0) {
+            document.getElementById('tbody-senhas').innerHTML = senhas.map(s => {
+                const tipoLabel = tipoMap[s.tipo] || s.tipo;
+                const statusLabel = statusMap[s.status] || s.status;
+                const dataExibicao = s.finalizada_em || s.chamada_em || s.criada_em;
+                
+                return `
+                    <tr>
+                        <td><span class="badge bg-primary p-2">${s.numero}</span></td>
+                        <td><small>${tipoLabel}</small></td>
+                        <td><small class="badge ${s.status === 'finalizada' ? 'bg-success' : s.status === 'cancelada' ? 'bg-danger' : 'bg-warning'}">${statusLabel}</small></td>
+                        <td><small class="text-muted">${new Date(dataExibicao).toLocaleString('pt-BR')}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        } else {
+            document.getElementById('tbody-senhas').innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhuma senha encontrada</td></tr>';
+        }
+    } catch (error) {
+        console.error('Erro ao abrir modal:', error);
+    }
+}
+</script>
+{% endblock %}
+            
+            <!-- Abas de Tipo de Relatório -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tipo_relatorio == 'diario' %}active{% endif %}" 
+                            id="tab-diario" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#relatorio-diario" 
+                            type="button" 
+                            role="tab">
+                        📅 Relatório Diário
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if tipo_relatorio == 'mensal' %}active{% endif %}" 
+                            id="tab-mensal" 
+                            data-bs-toggle="tab" 
+                            data-bs-target="#relatorio-mensal" 
+                            type="button" 
+                            role="tab">
+                        📈 Relatório Mensal
+                    </button>
+                </li>
+            </ul>
+            
+            <!-- Conteúdo das Abas -->
+            <div class="tab-content">
+                <!-- Relatório Diário -->
+                <div class="tab-pane fade {% if tipo_relatorio == 'diario' %}show active{% endif %}" id="relatorio-diario">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Relatório Diário</h5>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="data-diaria" class="form-label">Selecione a Data:</label>
+                                <input type="date" id="data-diaria" class="form-control" value="">
+                                <small class="text-muted">Data padrão: hoje</small>
+                            </div>
+                            
+                            <button id="btn-gerar-diario" class="btn btn-primary mb-4">
+                                <i class="fas fa-chart-bar"></i> Gerar Relatório
+                            </button>
+                            
+                            <div id="resultado-diario" style="display: none;">
+                                <!-- Banner com intervalo filtrado -->
+                                <div class="alert alert-info mb-4 border-start border-5" style="border-left-color: #0dcaf0 !important;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><strong>📅 Período Selecionado:</strong></h6>
+                                            <p class="mb-0 fs-6">
+                                                <span id="diario-data-filtro" class="badge bg-primary p-2">-</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-primary card-clickable" data-tipo="diario" data-status="total">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Total de Senhas</h6>
+                                                <h3 class="text-primary mb-0" id="diario-total">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-success card-clickable" data-tipo="diario" data-status="finalizadas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Finalizadas</h6>
+                                                <h3 class="text-success mb-0" id="diario-finalizadas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-danger card-clickable" data-tipo="diario" data-status="canceladas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Canceladas</h6>
+                                                <h3 class="text-danger mb-0" id="diario-canceladas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-warning card-clickable" data-tipo="diario" data-status="ausentes">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Ausentes</h6>
+                                                <h3 class="text-warning mb-0" id="diario-ausentes">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">Distribuição por Tipo de Consulta</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🆕 Primeira Consulta:</strong> <span id="diario-primeira_consulta" class="badge bg-info">0</span></p>
+                                                        <p class="mb-2"><strong>📝 Nova Consulta:</strong> <span id="diario-nova_consulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🔄 Retorno:</strong> <span id="diario-retorno" class="badge bg-info">0</span></p>
+                                                        <p class="mb-0"><strong>🤝 Interconsulta:</strong> <span id="diario-interconsulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Relatório Mensal -->
+                <div class="tab-pane fade {% if tipo_relatorio == 'mensal' %}show active{% endif %}" id="relatorio-mensal">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Relatório Mensal</h5>
+                        </div>
+                        
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="ano" class="form-label">Ano:</label>
+                                    <input type="number" id="ano" class="form-control" value="">
+                                    <small class="text-muted">Ano em números (ex: 2026)</small>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="mes" class="form-label">Mês:</label>
+                                    <select id="mes" class="form-select">
+                                        <option value="">Selecione o mês</option>
+                                        <option value="1">Janeiro</option>
+                                        <option value="2">Fevereiro</option>
+                                        <option value="3">Março</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Maio</option>
+                                        <option value="6">Junho</option>
+                                        <option value="7">Julho</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Setembro</option>
+                                        <option value="10">Outubro</option>
+                                        <option value="11">Novembro</option>
+                                        <option value="12">Dezembro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button id="btn-gerar-mensal" class="btn btn-success mb-4">
+                                <i class="fas fa-chart-line"></i> Gerar Relatório
+                            </button>
+                            
+                            <div id="resultado-mensal" style="display: none;">
+                                <!-- Banner com intervalo filtrado -->
+                                <div class="alert alert-success mb-4 border-start border-5" style="border-left-color: #198754 !important;">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1"><strong>📅 Período Selecionado:</strong></h6>
+                                            <p class="mb-0 fs-6">
+                                                <span id="mensal-data-filtro" class="badge bg-success p-2">-</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-primary card-clickable" data-tipo="mensal" data-status="total">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Total do Mês</h6>
+                                                <h3 class="text-primary mb-0" id="mensal-total">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-success card-clickable" data-tipo="mensal" data-status="finalizadas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Finalizadas</h6>
+                                                <h3 class="text-success mb-0" id="mensal-finalizadas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-danger card-clickable" data-tipo="mensal" data-status="canceladas">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Canceladas</h6>
+                                                <h3 class="text-danger mb-0" id="mensal-canceladas">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-3">
+                                        <div class="card text-center border-warning card-clickable" data-tipo="mensal" data-status="ausentes">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-muted">Ausentes</h6>
+                                                <h3 class="text-warning mb-0" id="mensal-ausentes">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">Distribuição por Tipo de Consulta</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🆕 Primeira Consulta:</strong> <span id="mensal-primeira_consulta" class="badge bg-info">0</span></p>
+                                                        <p class="mb-2"><strong>📝 Nova Consulta:</strong> <span id="mensal-nova_consulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2"><strong>🔄 Retorno:</strong> <span id="mensal-retorno" class="badge bg-info">0</span></p>
+                                                        <p class="mb-0"><strong>🤝 Interconsulta:</strong> <span id="mensal-interconsulta" class="badge bg-info">0</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para exibir senhas -->
+<div class="modal fade" id="modalSenhas" tabindex="-1" aria-labelledby="modalsenhasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalsenhasLabel">Senhas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover table-sm" id="tabela-senhas">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Status</th>
+                            <th>Data/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-senhas">
+                        <tr><td colspan="4" class="text-center">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Data padrão de hoje
+const hoje = new Date().toISOString().split('T')[0];
+document.getElementById('data-diaria').value = hoje;
+
+// Ano e mês padrão
+const agora = new Date();
+document.getElementById('ano').value = agora.getFullYear();
+document.getElementById('mes').value = agora.getMonth() + 1;
+
+// Event listeners
+document.getElementById('btn-gerar-diario').addEventListener('click', carregarRelatorioDiario);
+document.getElementById('btn-gerar-mensal').addEventListener('click', carregarRelatorioMensal);
+
+// Cards clicáveis
+document.querySelectorAll('.card-clickable').forEach(card => {
+    card.addEventListener('click', abrirModalSenhas);
+});
+
+async function carregarRelatorioDiario() {
+    const dataInput = document.getElementById('data-diaria').value;
+    
+    const dataObj = new Date(dataInput + 'T00:00:00');
+    const dataFormatada = dataObj.toLocaleDateString('pt-BR', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    });
+    
+    try {
+        const url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${dataInput}`;
+        const response = await fetch(url);
+        const data_resp = await response.json();
+        
+        // Atualizar intervalo
+        document.getElementById('diario-data-filtro').textContent = `${dataFormatada}`;
+        
+        document.getElementById('diario-total').textContent = data_resp.total_senhas;
+        document.getElementById('diario-finalizadas').textContent = data_resp.finalizadas;
+        document.getElementById('diario-canceladas').textContent = data_resp.canceladas;
+        document.getElementById('diario-ausentes').textContent = data_resp.ausentes;
+        
+        // Distribuição por tipo
+        document.getElementById('diario-primeira_consulta').textContent = data_resp.por_tipo.primeira_consulta || 0;
+        document.getElementById('diario-nova_consulta').textContent = data_resp.por_tipo.nova_consulta || 0;
+        document.getElementById('diario-retorno').textContent = data_resp.por_tipo.retorno || 0;
+        document.getElementById('diario-interconsulta').textContent = data_resp.por_tipo.interconsulta || 0;
+        
+        document.getElementById('resultado-diario').style.display = 'block';
+        
+        // Guardar dados para modal
+        window.relatorioAtualDiario = data_resp;
+        window.filtroAtualData = dataInput;
+    } catch (error) {
+        console.error('Erro ao carregar relatório:', error);
+        alert('Erro ao gerar relatório diário');
+    }
+}
+
+async function carregarRelatorioMensal() {
+    const ano = document.getElementById('ano').value;
+    const mes = document.getElementById('mes').value;
+    
+    if (!ano || !mes) {
+        alert('Selecione ano e mês');
+        return;
+    }
+    
+    // Formatar período
+    const nomeMeses = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+    const periodoFormatado = `${nomeMeses[mes]} de ${ano}`;
+    
+    try {
+        const url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${ano}&mes=${mes}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        // Atualizar intervalo
+        document.getElementById('mensal-data-filtro').textContent = `${periodoFormatado}`;
+        
+        document.getElementById('mensal-total').textContent = data.total_senhas;
+        document.getElementById('mensal-finalizadas').textContent = data.finalizadas;
+        document.getElementById('mensal-canceladas').textContent = data.canceladas;
+        document.getElementById('mensal-ausentes').textContent = data.ausentes;
+        
+        // Distribuição por tipo
+        document.getElementById('mensal-primeira_consulta').textContent = data.por_tipo.primeira_consulta || 0;
+        document.getElementById('mensal-nova_consulta').textContent = data.por_tipo.nova_consulta || 0;
+        document.getElementById('mensal-retorno').textContent = data.por_tipo.retorno || 0;
+        document.getElementById('mensal-interconsulta').textContent = data.por_tipo.interconsulta || 0;
+        
+        document.getElementById('resultado-mensal').style.display = 'block';
+        
+        // Guardar dados para modal
+        window.relatorioAtualMensal = data;
+        window.filtroAtualAno = ano;
+        window.filtroAtualMes = mes;
+    } catch (error) {
+        console.error('Erro ao carregar relatório:', error);
+        alert('Erro ao gerar relatório mensal');
+    }
+}
+
+async function abrirModalSenhas(event) {
+    const card = event.currentTarget;
+    const tipo = card.getAttribute('data-tipo');
+    const status = card.getAttribute('data-status');
+    
+    let url = '';
+    let titulo = '';
+    
+    if (tipo === 'diario') {
+        if (!window.filtroAtualData) return;
+        
+        if (status === 'total') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}`;
+            titulo = 'Todas as Senhas';
+        } else if (status === 'finalizadas') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}&status=finalizada`;
+            titulo = 'Senhas Finalizadas';
+        } else if (status === 'canceladas') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}&status=cancelada`;
+            titulo = 'Senhas Canceladas';
+        } else if (status === 'ausentes') {
+            url = `{{ url_for("senhas.api_relatorio_diario") }}?data_ref=${window.filtroAtualData}&status=ausente`;
+            titulo = 'Senhas de Ausentes';
+        }
+    } else if (tipo === 'mensal') {
+        if (!window.filtroAtualAno || !window.filtroAtualMes) return;
+        
+        if (status === 'total') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}`;
+            titulo = 'Todas as Senhas do Mês';
+        } else if (status === 'finalizadas') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}&status=finalizada`;
+            titulo = 'Senhas Finalizadas do Mês';
+        } else if (status === 'canceladas') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}&status=cancelada`;
+            titulo = 'Senhas Canceladas do Mês';
+        } else if (status === 'ausentes') {
+            url = `{{ url_for("senhas.api_relatorio_mensal") }}?ano=${window.filtroAtualAno}&mes=${window.filtroAtualMes}&status=ausente`;
+            titulo = 'Senhas de Ausentes do Mês';
+        }
+    }
+    
+    if (!url) return;
+    
+    try {
+        document.getElementById('modalsenhasLabel').textContent = titulo;
+        document.getElementById('tbody-senhas').innerHTML = '<tr><td colspan="4" class="text-center">Carregando...</td></tr>';
+        
+        const modal = new bootstrap.Modal(document.getElementById('modalSenhas'));
+        modal.show();
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        // Tipo mapping
+        const tipoMap = {
+            'primeira_consulta': '🆕 Primeira Consulta',
+            'nova_consulta': '📝 Nova Consulta',
+            'retorno': '🔄 Retorno',
+            'interconsulta': '🤝 Interconsulta'
+        };
+        
+        // Status mapping
+        const statusMap = {
+            'finalizada': '✅ Finalizada',
+            'cancelada': '❌ Cancelada',
+            'ausente': '⚠️ Ausente',
+            'chamada': '📢 Chamada',
+            'rechamada': '🔄 Rechamada'
+        };
+        
+        let senhas = [];
+        if (data.senhas) {
+            senhas = data.senhas;
+        } else if (data.ultimas) {
+            senhas = data.ultimas;
+        } else if (data.todas) {
+            senhas = data.todas;
+        }
+        
+        if (senhas && senhas.length > 0) {
+            document.getElementById('tbody-senhas').innerHTML = senhas.map(s => {
+                const tipoLabel = tipoMap[s.tipo] || s.tipo;
+                const statusLabel = statusMap[s.status] || s.status;
+                const dataExibicao = s.finalizada_em || s.chamada_em || s.criada_em;
+                
+                return `
+                    <tr>
+                        <td><span class="badge bg-primary p-2">${s.numero}</span></td>
+                        <td><small>${tipoLabel}</small></td>
+                        <td><small class="badge ${s.status === 'finalizada' ? 'bg-success' : s.status === 'cancelada' ? 'bg-danger' : 'bg-warning'}">${statusLabel}</small></td>
+                        <td><small class="text-muted">${new Date(dataExibicao).toLocaleString('pt-BR')}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        } else {
+            document.getElementById('tbody-senhas').innerHTML = '<tr><td colspan="4" class="text-center text-muted">Nenhuma senha encontrada</td></tr>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar senhas:', error);
+        alert('Erro ao carregar dados das senhas');
+    }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

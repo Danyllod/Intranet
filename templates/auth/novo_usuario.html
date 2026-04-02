@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar de Navegação -->
+        <div class="col-md-3 col-lg-2 mb-4">
+            <div class="list-group sticky-top" style="top: 20px;">
+                <h5 class="list-group-item bg-dark text-white fw-bold">
+                    <i class="fas fa-cog"></i> Menu
+                </h5>
+                <a href="{{ url_for('auth.admin') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-users"></i> Gerenciar Usuários
+                </a>
+                <a href="{{ url_for('senhas.relatorios') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-chart-bar"></i> Relatórios
+                </a>
+                <a href="{{ url_for('senhas.recepcao') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-ticket-alt"></i> Recepção
+                </a>
+                <a href="{{ url_for('senhas.atendimento') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-headset"></i> Atendimento
+                </a>
+                <a href="{{ url_for('senhas.painel') }}" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tv"></i> Painel
+                </a>
+                <div class="list-group-item bg-light">
+                    <hr class="my-2">
+                </div>
+                <a href="{{ url_for('auth.logout') }}" class="list-group-item list-group-item-action text-danger">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </div>
+        </div>
+        
+        <!-- Conteúdo Principal -->
+        <div class="col-md-9 col-lg-10">
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Mensagens Flash -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <!-- Card do Formulário -->
+                    <div class="card shadow">
+                        <div class="card-header bg-dark text-white">
+                            <h4 class="mb-0">
+                                <i class="fas fa-user-plus"></i> Criar Novo Usuário
+                            </h4>
+                        </div>
+                        
+                        <div class="card-body p-4">
+                            <form method="POST" action="{{ url_for('auth.novo_usuario') }}">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label fw-bold">
+                                        <i class="fas fa-user"></i> Usuário <span class="text-danger">*</span>
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="username" 
+                                        name="username" 
+                                        placeholder="Digite o nome de usuário"
+                                        required
+                                        autofocus
+                                        pattern="[a-zA-Z0-9_]{3,20}"
+                                        title="Mínimo 3 caracteres, apenas letras, números e underscore"
+                                    >
+                                    <small class="form-text text-muted">
+                                        Mínimo 3 caracteres, apenas letras, números e underscore
+                                    </small>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-bold">
+                                        <i class="fas fa-envelope"></i> Email <span class="text-danger">*</span>
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        class="form-control" 
+                                        id="email" 
+                                        name="email" 
+                                        placeholder="Digite o email"
+                                        required
+                                    >
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="password" class="form-label fw-bold">
+                                            <i class="fas fa-lock"></i> Senha <span class="text-danger">*</span>
+                                        </label>
+                                        <input 
+                                            type="password" 
+                                            class="form-control" 
+                                            id="password" 
+                                            name="password" 
+                                            placeholder="Mínimo 6 caracteres"
+                                            required
+                                            minlength="6"
+                                        >
+                                        <small class="form-text text-muted">
+                                            Mínimo 6 caracteres
+                                        </small>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="password_confirm" class="form-label fw-bold">
+                                            <i class="fas fa-lock"></i> Confirmar Senha <span class="text-danger">*</span>
+                                        </label>
+                                        <input 
+                                            type="password" 
+                                            class="form-control" 
+                                            id="password_confirm" 
+                                            name="password_confirm" 
+                                            placeholder="Repita a senha"
+                                            required
+                                            minlength="6"
+                                        >
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="role" class="form-label fw-bold">
+                                        <i class="fas fa-shield-alt"></i> Função <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="role" name="role" required>
+                                        <option value="basico">Usuário Básico</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Criar Usuário
+                                    </button>
+                                    <a href="{{ url_for('auth.admin') }}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sidebar com Informações -->
+                <div class="col-lg-4">
+                    <div class="card bg-light">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-info-circle"></i> Informações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Usuário Básico:</strong></p>
+                            <ul class="small">
+                                <li>Acesso a Recepção</li>
+                                <li>Acesso a Atendimento</li>
+                            </ul>
+                            
+                            <hr>
+                            
+                            <p><strong>Administrador:</strong></p>
+                            <ul class="small">
+                                <li>Acesso a Admin</li>
+                                <li>Acesso a Relatórios</li>
+                                <li>Acesso a Recepção</li>
+                                <li>Acesso a Atendimento</li>
+                                <li>Gerenciar Usuários</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

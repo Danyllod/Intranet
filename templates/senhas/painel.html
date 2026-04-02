@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Senhas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+<div class="container-fluid p-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
+    
+    <!-- GRANDE DESTAQUE - Senha em Atendimento -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-lg border-0" style="background: rgba(255,255,255,0.95);">
+                <div class="card-body text-center p-5">
+                    <h5 class="text-muted mb-3" style="font-size: 1.2rem;">
+                        <i class="fas fa-volume-up"></i> SUA SENHA ESTÁ SENDO CHAMADA
+                    </h5>
+                    
+                    <div id="senha-atual" style="min-height: 250px; display: flex; align-items: center; justify-content: center;">
+                        <div>
+                            <p class="text-muted mb-4" style="font-size: 1.1rem;">Aguardando próxima senha...</p>
+                            <div class="spinner-border text-primary" role="status" style="width: 4rem; height: 4rem;">
+                                <span class="visually-hidden">Carregando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fila Status e Últimas -->
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 text-center">📋 Próximos a Serem Chamados</h5>
+                </div>
+                
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    <div id="lista-fila">
+                        <p class="text-center text-muted py-4">Carregando fila...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ultimas Chamadas - Seção Pequena -->
+        <div class="col-lg-8">
+            <div class="card shadow border-0">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0">✅ Ultimas Atendidas</h5>
+                </div>
+                
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0" id="tabela-ultimas">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="text-center">Número</th>
+                                    <th class="text-center">Tipo</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Chamadas</th>
+                                    <th class="text-center">Finalizada</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-ultimas">
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-3">
+                                        <small>Carregando...</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Timestamp -->
+    <div class="row mt-4">
+        <div class="col-12 text-center text-white">
+            <small>
+                <i class="fas fa-sync-alt"></i> 
+                Atualizando em tempo real
+                &nbsp;|&nbsp;
+                <span id="hora-atualizacao"></span>
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes pulse-grande {
+        0%, 100% { 
+            transform: scale(1);
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        50% { 
+            transform: scale(1.05);
+            text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+    }
+    
+    .senha-gigante {
+        font-size: 8rem;
+        font-weight: 900;
+        line-height: 1;
+        color: #667eea;
+        animation: pulse-grande 1s ease-in-out infinite;
+        letter-spacing: -0.05em;
+    }
+    
+    .card {
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    body {
+        background: #f5f5f5;
+    }
+</style>
+
+<script>
+// Atualizar a cada 2 segundos
+setInterval(() => {
+    atualizarStatus();
+    carregarFila();
+    atualizarUltimas();
+    atualizarHora();
+}, 2000);
+
+// Atualização inicial
+atualizarStatus();
+carregarFila();
+atualizarUltimas();
+atualizarHora();
+
+async function atualizarStatus() {
+    try {
+        const response = await fetch('{{ url_for("senhas.api_painel_status") }}');
+        const data = await response.json();
+        
+        // Atualizar senha atual - DESTAQUE MÁXIMO
+        const senhaAtualDiv = document.getElementById('senha-atual');
+        if (data.atual) {
+            const labelRechama = data.atual.status === 'rechamada' 
+                ? '<p class="text-danger fw-bold mb-2" style="font-size: 1.3rem;">⚠️ RECHAMA</p>' 
+                : '';
+            
+            let tipoLabel = '';
+            switch(data.atual.tipo) {
+                case 'primeira_consulta': tipoLabel = '🆕 Primeira Consulta'; break;
+                case 'nova_consulta': tipoLabel = '📝 Nova Consulta'; break;
+                case 'retorno': tipoLabel = '🔄 Retorno'; break;
+                case 'interconsulta': tipoLabel = '🤝 Interconsulta'; break;
+                default: tipoLabel = data.atual.tipo;
+            }
+            
+            const tipoBadge = data.atual.is_prioridade 
+                ? '<div class="badge bg-danger p-2 mt-3" style="font-size: 1.1rem;">🔴 PRIORIDADE</div>' 
+                : '';
+            
+            senhaAtualDiv.innerHTML = `
+                <div>
+                    ${labelRechama}
+                    <div class="senha-gigante mb-3">${data.atual.numero}</div>
+                    <p class="mb-1"><small class="text-muted">Tipo: <strong style="color: #667eea; font-size: 1.1rem;">${tipoLabel}</strong></small></p>
+                    <p class="mb-1"><small class="text-muted">Guichê: <strong style="color: #667eea; font-size: 1.1rem;">${data.atual.guiche || 'N/A'}</strong></small></p>
+                    ${tipoBadge}
+                </div>
+            `;
+        } else {
+            senhaAtualDiv.innerHTML = `
+                <div class="text-center">
+                    <p class="text-muted mb-4">Aguardando próxima senha...</p>
+                    <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar status:', error);
+    }
+}
+
+async function carregarFila() {
+    try {
+        const response = await fetch('{{ url_for("senhas.api_fila") }}');
+        const data = await response.json();
+        
+        const filaDiv = document.getElementById('lista-fila');
+        
+        if (data.senhas && data.senhas.length > 0) {
+            // Ordenar por prioridade (marcadas como prioridade primeiro)
+            const senhasOrdenadas = data.senhas.sort((a, b) => {
+                if (a.is_prioridade && !b.is_prioridade) return -1;
+                if (!a.is_prioridade && b.is_prioridade) return 1;
+                // Dentro do mesmo nível, manter ordem de sequencia
+                return a.sequencia_dia - b.sequencia_dia;
+            });
+            
+            filaDiv.innerHTML = senhasOrdenadas.map((s, index) => {
+                const prioIcon = s.is_prioridade ? '🔴' : '🔵';
+                const prioBadge = s.is_prioridade ? 'bg-danger' : 'bg-secondary';
+                const posicao = index + 1;
+                
+                let tipoLabel = '';
+                switch(s.tipo) {
+                    case 'primeira_consulta': tipoLabel = '🆕 Primeira'; break;
+                    case 'nova_consulta': tipoLabel = '📝 Nova'; break;
+                    case 'retorno': tipoLabel = '🔄 Retorno'; break;
+                    case 'interconsulta': tipoLabel = '🤝 Interconsulta'; break;
+                    default: tipoLabel = s.tipo;
+                }
+                
+                return `
+                    <div class="d-flex align-items-center mb-3 p-2 rounded" style="background: #f8f9fa; border-left: 4px solid ${s.is_prioridade ? '#dc3545' : '#6c757d'};">
+                        <div class="badge ${prioBadge} p-3 me-3" style="font-size: 1.2rem; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                            ${s.numero}
+                        </div>
+                        <div class="flex-grow-1">
+                            <p class="mb-1"><strong>#${posicao}</strong> <small>${tipoLabel}</small></p>
+                            <small class="text-muted">${prioIcon} ${s.is_prioridade ? 'Prioridade' : 'Normal'}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            filaDiv.innerHTML = '<p class="text-center text-muted py-4"><small>Fila vazia</small></p>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar fila:', error);
+    }
+}
+
+async function atualizarUltimas() {
+    try {
+        const response = await fetch('{{ url_for("senhas.api_ultimas") }}?limite=5');
+        const data = await response.json();
+        
+        const tbody = document.getElementById('tbody-ultimas');
+        
+        if (data.ultimas && data.ultimas.length > 0) {
+            tbody.innerHTML = data.ultimas.map(s => {
+                const statusClass = s.status === 'finalizada' ? 'bg-success' : 
+                                   s.status === 'cancelada' ? 'bg-danger' : 'bg-warning text-dark';
+                const prioIcon = s.is_prioridade ? '🔴' : '🔵';
+                
+                return `
+                    <tr>
+                        <td class="text-center"><span class="badge bg-primary p-2">${s.numero}</span></td>
+                        <td class="text-center"><small>${prioIcon}</small></td>
+                        <td class="text-center"><span class="badge ${statusClass}" style="font-size: 0.7rem;">${s.status.toUpperCase()}</span></td>
+                        <td class="text-center"><small>#${s.total_chamadas}</small></td>
+                        <td class="text-center"><small class="text-muted">${new Date(s.finalizada_em).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</small></td>
+                    </tr>
+                `;
+            }).join('');
+        } else {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3"><small>Nenhuma senha finalizada</small></td></tr>';
+        }
+    } catch (error) {
+        console.error('Erro ao carregar ultimas:', error);
+    }
+}
+
+function atualizarHora() {
+    const agora = new Date();
+    document.getElementById('hora-atualizacao').textContent = agora.toLocaleTimeString('pt-BR');
+}
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

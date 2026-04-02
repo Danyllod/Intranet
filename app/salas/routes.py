@@ -123,9 +123,9 @@ def solicitar_reserva_sala():
         sucesso = True
 
         return render_template('salas/solicitar_reserva_sala.html',
-                             title='Solicitar Reserva de Sala',
-                             form={},
-                             sucesso=sucesso)
+                            title='Solicitar Reserva de Sala',
+                            form={},
+                            sucesso=sucesso)
 
     # GET: exibe o formulário
     hoje = date.today().isoformat()
@@ -145,14 +145,14 @@ def gerenciar_solicitacoes():
     if incluir_historico:
         # Mostra pendentes + histórico (aprovadas e negadas)
         solicitacoes = (ReservaSala.query
-                       .order_by(ReservaSala.data_solicitacao.desc())
-                       .all())
+                    .order_by(ReservaSala.data_solicitacao.desc())
+                    .all())
     else:
         # Mostra apenas pendentes
         solicitacoes = (ReservaSala.query
-                       .filter_by(status='pendente')
-                       .order_by(ReservaSala.data_solicitacao.desc())
-                       .all())
+                    .filter_by(status='pendente')
+                    .order_by(ReservaSala.data_solicitacao.desc())
+                    .all())
     
     # Carrega solicitações de cancelamento
     if incluir_historico:
@@ -208,11 +208,11 @@ def gerenciar_confirmacoes():
     """Mostra todas as reuniões aprovadas para confirmar/cancelar a partir de hoje"""
     today = date.today()
     reunioes = (ReservaSala.query
-               .filter_by(status='aprovado')
-               .filter(ReservaSala.data >= today)
-               .order_by(ReservaSala.data.asc(),
+            .filter_by(status='aprovado')
+            .filter(ReservaSala.data >= today)
+            .order_by(ReservaSala.data.asc(),
                         ReservaSala.hora_inicio.asc())
-               .all())
+            .all())
     
     return render_template('salas/gerenciar_confirmacoes.html',
                         title='Gerenciar Confirmações',
@@ -285,10 +285,10 @@ def solicitar_cancelamento_reserva():
     if request.method == 'GET':
         # Carrega lista de reservas aprovadas a partir de hoje
         reservas = (ReservaSala.query
-                   .filter_by(status='aprovado')
-                   .filter(ReservaSala.data >= today)
-                   .order_by(ReservaSala.data.asc(), ReservaSala.hora_inicio.asc())
-                   .all())
+                .filter_by(status='aprovado')
+                .filter(ReservaSala.data >= today)
+                .order_by(ReservaSala.data.asc(), ReservaSala.hora_inicio.asc())
+                .all())
     
     return render_template('salas/solicitar_cancelamento_reserva.html',
                         title='Solicitar Cancelamento',

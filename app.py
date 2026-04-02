@@ -1,3 +1,6 @@
+# Carregar variáveis de ambiente do arquivo .env (se existir)
+import dotenv_loader  # noqa: F401
+
 from app import create_app
 
 app = create_app()
